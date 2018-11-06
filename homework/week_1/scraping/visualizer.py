@@ -24,6 +24,7 @@ with open(INPUT_CSV, newline='') as csvfile:
     # goes through each row in the CSV file and appends all individual
     # ratings to its respective year
     for row in reader:
+
         # isolates the year and rating variables from the current row
         year = int(row['Year'])
         rating = float(row['Rating'])
@@ -36,6 +37,7 @@ x = data_dict.keys()
 y = []
 
 for year in range(START_YEAR, END_YEAR):
+
     # calculates the average rating for each year in the data_dict
     avg = round(sum(data_dict[year]) / len(data_dict[year]), 2)
 
@@ -57,5 +59,4 @@ plt.ylabel('avg rating')
 plt.xlabel('year')
 
 if __name__ == "__main__":
-    # print(data_dict)
     plt.show()

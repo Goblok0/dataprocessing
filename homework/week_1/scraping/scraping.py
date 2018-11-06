@@ -19,17 +19,10 @@ TARGET_URL = "https://www.imdb.com/search/title?title_type=feature&release_date=
 BACKUP_HTML = 'movies.html'
 OUTPUT_CSV = 'movies.csv'
 
-
+# extracts the title, rating, year of release, actors/actresses and runtimes
+# from the IMDB target url and returns as a list with lists of extracted info
 def extract_movies(dom):
-    """
-    Extract a list of highest rated movies from DOM (of IMDB page).
-    Each movie entry should contain the following fields:
-    + Title
-    + Rating
-    + Year of release (only a number!)
-    + Actors/actresses (comma separated if more than one)
-    + Runtime (only a number!)
-    """
+
     title_list = []
     rating_list = []
     year_list = []
@@ -41,7 +34,6 @@ def extract_movies(dom):
         for title in section.find_all('a'):
             url = title.get('href')
             if "adv_li_tt" in url:
-                #print(link.string)
                 title_list.append(title.string)
 
         # isolates the rating from the current section
@@ -76,7 +68,6 @@ def extract_movies(dom):
             # check if the isolated year is numeric, else appends N/A
             # to the year_list
             if year.isnumeric():
-                #print(stripped_year)
                 year_list.append(year)
 
             else:

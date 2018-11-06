@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # Name: Julian Evalle
 # Student number: 11286369
+# Program Template created by M.Prog UvA
+#
+# This program extracts specific information from the target URL and writes it
+# to a CSV file
 """
 This script scrapes IMDB and outputs a CSV file with highest rated movies.
 """
@@ -10,8 +14,6 @@ from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
-
-import re
 
 TARGET_URL = "https://www.imdb.com/search/title?title_type=feature&release_date=2008-01-01,2018-01-01&num_votes=5000,&sort=user_rating,desc"
 BACKUP_HTML = 'movies.html'
@@ -26,7 +28,7 @@ def extract_movies(dom):
     + Rating
     + Year of release (only a number!)
     + Actors/actresses (comma separated if more than one)
-    - Runtime (only a number!)
+    + Runtime (only a number!)
     """
     title_list = []
     rating_list = []
@@ -42,12 +44,11 @@ def extract_movies(dom):
                 #print(link.string)
                 title_list.append(title.string)
 
-        # isolates the rating
-        # excerpt for-loop
+        # isolates the rating from the current section
         for rating in section.find_all('strong'):
-            print(rating.string)
-            #print(rating)
 
+            # check if the string inside rating is a float/exists, else
+            # appends N/A to the rating list
             try:
                 float(rating.string)
                 rating_list.append(rating.string)
@@ -55,66 +56,69 @@ def extract_movies(dom):
             except:
                 rating_list.append("N/A")
 
-        # isolates years
-        # print(section.find_all("span", {"class": "lister-item-year text-muted unbold"}))
+        # isolates year from the current section
+        year = section.find("span", {"class": "lister-item-year text-muted unbold"})
 
-        for year in section.find_all("span", {"class": "lister-item-year text-muted unbold"}):
+        # check if a string can be extracted from year
+        if year.string is None:
+            year_list.append("N/A")
 
-            if year.string is None:
-                year_list.append("N/A")
+        else:
+            # removes all parentheses from the string
+            year = year.string.replace('(','').replace(')','')
+
+            # check if two or more words exist in the string
+            # selects the year part of the string
+            if " " in year:
+                year = year.split(" ")
+                year = year[1]
+
+            # check if the isolated year is numeric, else appends N/A
+            # to the year_list
+            if year.isnumeric():
+                #print(stripped_year)
+                year_list.append(year)
 
             else:
-                year = year.string.replace('(','').replace(')','')
-
-                if " " in year:
-                    year = year.split(" ")
-                    year = year[1]
-
-                if year.isnumeric():
-                    #print(stripped_year)
-                    year_list.append(year)
-
-                else:
-                    year_list.append("N/A")
+                year_list.append("N/A")
 
         # isolate actors/actresses to a list per movie
         actors = []
         for actor in section.find_all('a'):
+
+            # extracts the link from actor
             url = actor.get('href')
 
+            # check if the current link will redirect to an actor
+            # and appends it to the actor list
             if "adv_li_st" in url:
-                #print(actor.string)
                 actors.append(actor.string)
 
+        # check if any actors were found in the current section
         if not actors:
             actors = "N/A"
 
+        # transforms the list in actors to a single string
         else:
             actors = ', '.join(actors)
 
+        # appends the actors list to actors_list
         actors_list.append(actors)
 
-        # isolates runtime
+        # isolates runtime from the current section
         if section.find_all("span", {"class": "runtime"}):
-            for runtime in section.find_all("span", {"class": "runtime"}):
-                # print(runtime.string)
-                splittime = runtime.string.split()
-                # print(splittime[0])
-                runtimes.append(splittime[0])
+            runtime = section.find("span", {"class": "runtime"})
+
+            # isolates the numeric part of the string and appends
+            # it to the runtimes list
+            splittime = runtime.string.split()
+            runtimes.append(splittime[0])
 
         else:
             runtimes.append("N/A")
 
-
-
-
-    print(len(title_list))
-    print(len(rating_list))
-    # print(year_list)
-    print(len(year_list))
-    print(len(runtimes))
-    print(len(actors_list))
-
+    # creates and fills the list that's going to be returned with
+    # the extracted data
     full_details = []
     full_details.append(title_list)
     full_details.append(rating_list)
@@ -122,9 +126,7 @@ def extract_movies(dom):
     full_details.append(runtimes)
     full_details.append(actors_list)
 
-    print(len(full_details))
     return full_details
-
 
 def save_csv(outfile, movies):
     """
@@ -133,22 +135,20 @@ def save_csv(outfile, movies):
     writer = csv.writer(outfile)
     writer.writerow(['Title', 'Rating', 'Year', 'Actors', 'Runtime'])
 
+    # define which list in the full_details list contains what information
     title_loc = 0
     rating_loc = 1
     year_loc = 2
     actors_loc = 4
     runtime_loc = 3
 
+    # write all the extracted data to its respective column
     for index in range(50):
-        # print(detail)
         writer.writerow([movies[title_loc][index],
                         movies[rating_loc][index],
                         movies[year_loc][index],
                         movies[actors_loc][index],
                         movies[runtime_loc][index]])
-
-    # ADD SOME CODE OF YOURSELF HERE TO WRITE THE MOVIES TO DISK
-
 
 def simple_get(url):
     """

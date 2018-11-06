@@ -1,1 +1,5 @@
 
+Q: What is a so called “branch” in Git terms and why would you use it
+
+A: a separate 'copy' of the main program in which you can alter the contents
+   to merge it with the main program on a later point

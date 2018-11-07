@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-# Name:
-# Student number:
+# Name: Julian Evalle
+# Student number: 11286369
+# Template made by: M.Prog UvA
+#
+# this program searches through the top 250 movies on IMDB and extracts certain
+# details per movie and places it in a CSV file
 """
 This script crawls the IMDB top 250 movies.
 """

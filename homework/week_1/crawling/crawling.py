@@ -147,6 +147,7 @@ def main():
 
     # Save a CSV file with the relevant information for the top 250 movies.
     print('Saving CSV ...')
+
     save_csv(os.path.join(SCRIPT_DIR, 'top250movies.csv'), rows)
 
 
@@ -275,29 +276,65 @@ def scrape_movie_page(dom):
     movie_details.append(directors)
     movie_details.append(writers)
     movie_details.append(stars)
+    movie_details.append(rating)
     movie_details.append(rating_num)
 
     return movie_details
 
+def save_csv(outfile, movies):
+
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+
+        writer = csv.writer(f)
+        writer.writerow(['title', 'runtime', 'genre(s)', 'directors', 'writer(s)',
+                        'actor(s)', 'rating(s)', 'number of rating(s)'])
+
+        title_loc = 0
+        year_loc = 1
+        runtime_loc = 2
+        genres_loc = 3
+        directors_loc = 4
+        writers_loc = 5
+        actors_loc = 6
+        rating_loc = 7
+        rate_num_loc = 8
+
+        for index in range(len(movies)):
+            writer.writerow([movies[index][title_loc],
+                            movies[index][runtime_loc],
+                            movies[index][genres_loc],
+                            movies[index][directors_loc],
+                            movies[index][writers_loc],
+                            movies[index][actors_loc],
+                            movies[index][rating_loc],
+                            movies[index][rate_num_loc]])
 
 if __name__ == '__main__':
-    html = simple_get(TOP_250_URL)
-
-    # parse the HTML file into a DOM representation
-    dom = BeautifulSoup(html, 'html.parser')
-
-    # extract the movies (using the function you implemented)
-    movie_urls = scrape_top_250(dom)
-
-    for movie in movie_urls:
-
-        html = simple_get(movie)
-        # parse the HTML file into a DOM representation
-        dom = BeautifulSoup(html, 'html.parser')
-        movie_details = scrape_movie_page(dom)
-
-
-    # main()  # call into the progam
-
-    # If you want to test the functions you wrote, you can do that here:
-    # ...
+    # error when using main():
+        # Traceback (most recent call last):
+        #   File "crawling.py", line 284, in <module>
+        #     main()  # call into the progam
+        #   File "crawling.py", line 123, in main
+        #     top_250_dom = BeautifulSoup(top_250_html, "lxml")
+        #   File "C:\Users\rejev\AppData\Local\Programs\Python\Python37-32\lib\site-packages\beautifulsoup4-4.6.3-py3.7.egg\bs4\__init__.py", line 246, in __init__
+        #     elif len(markup) <= 256 and (
+        # TypeError: object of type 'NoneType' has no len()
+    main()
+    # html = simple_get(TOP_250_URL)
+    #
+    #
+    # # parse the HTML file into a DOM representation
+    # dom = BeautifulSoup(html, 'html.parser')
+    #
+    # # extract the movies (using the function you implemented)
+    # movie_urls = scrape_top_250(dom)
+    #
+    # movies = []
+    # for movie in movie_urls:
+    #
+    #     html = simple_get(movie)
+    #     # parse the HTML file into a DOM representation
+    #     dom = BeautifulSoup(html, 'html.parser')
+    #     movie_details = scrape_movie_page(dom)
+    #     movies.append(movie_details)
+    #

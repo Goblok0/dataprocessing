@@ -48,7 +48,11 @@ for year in range(START_YEAR, END_YEAR):
 plt.plot(x,y)
 
 # narrows down the values on the x and y axis
-plt.axis([2007.80, 2017.20, 7.5, 10])
+y_low_bound = 2007.80
+y_high_bound = 2017.20
+x_low_bound = 7.5
+x_high_bound = 10
+plt.axis([y_low_bound, y_high_bound, x_low_bound, x_high_bound])
 
 # adds the numerical value of each point above themselves in the graph
 for x,y in zip(x,y):

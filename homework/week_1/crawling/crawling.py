@@ -165,14 +165,19 @@ def scrape_top_250(soup):
         part, the domain part and the path part).
     """
     movie_urls = set()
+    # beginning of the movie link
     link = "https://www.imdb.com"
 
+    # searches for all movielinks one the page
     for title in soup.find_all('a'):
         url = title.get('href')
-        # print(title)
+
+        # check if an url was extracted
         if url == None:
             pass
+        # check if the url refers to moviepage
         elif "chttp_tt" in url:
+            # completes the url to the moviepage
             complete_url = link + url
             movie_urls.add(complete_url)
 
@@ -197,58 +202,73 @@ def scrape_movie_page(dom):
         +rating,
         +number of ratings.
     """
-    # YOUR SCRAPING CODE GOES HERE:
-    # Return everything of interest for this movie (all strings as specified
-    # in the docstring of this function).
-
+    # finds the title on the moviepage
     title = dom.find('h1')
 
+    # extracts the title part of the found text
     split_title = title.text.split("(")
     title = split_title[0].strip()
 
+    # extracts the year part of the found text
     year = split_title[1]
     year = year.replace(")","")
 
+    # extracts the year of release from the moviepage
     time = dom.find('time')
     time = time.text.strip()
 
+    # extracts the genres from the movie page
     genres = set()
+
+    # ensures only the genres from the genres on the top of the page
+    # are isolated
     title_wrapper = dom.find('div',{"class": "title_wrapper"})
+
+    # searches through the isolated title_wrapper
     for genre in title_wrapper.find_all("a"):
         url = genre.get('href')
 
+        # check if the url contains something
         if url == None:
             continue
 
+        # check if the url involves a link to a genre
         elif "genres" in url:
             genre = genre.text.strip()
             genres.add(genre)
 
+    # joins the found genres to one string
     genres = '; '.join(genres)
 
     directors = []
     writers = []
     stars = []
 
+    # isolates the part of the page with staff info
     people_wrapper = dom.find('div',{"class": "plot_summary_wrapper"})
     for person in people_wrapper.find_all('a'):
         url = person.get('href')
 
+        # check if the url contains something
         if url == None:
             continue
 
+        # check if the found url refers to a director's page
         elif "tt_ov_dr" in url:
             director = person.text.strip()
             directors.append(director)
 
+        # check if the found url refers to a writer's page
         elif "tt_ov_wr" in url:
             writer = person.text.strip()
             writers.append(writer)
 
+        # check if the found url refers to an actors/actresses's page
         elif "tt_ov_st_sm" in url:
             star = person.text.strip()
             stars.append(star)
 
+    # removes the non-names from their respective list
     if "credit" in directors[-1]:
         del directors[-1]
 
@@ -258,16 +278,20 @@ def scrape_movie_page(dom):
     if "cast & crew" in stars[-1]:
         del stars[-1]
 
+    # joins the lists to one string
     directors = '; '.join(directors)
     writers = '; '.join(writers)
     stars = '; '.join(stars)
 
+    # finds the rating of the movie on the page
     rating = dom.find('span',{"itemprop": "ratingValue"})
     rating = rating.string
 
+    # finds the rating count of the movie on the page
     rating_num = dom.find('span',{"itemprop": "ratingCount"})
     rating_num = rating_num.string
 
+    # combines all the found information to one list
     movie_details = []
     movie_details.append(title)
     movie_details.append(year)
@@ -281,60 +305,7 @@ def scrape_movie_page(dom):
 
     return movie_details
 
-def save_csv(outfile, movies):
-
-    with open(filename, 'w', newline='', encoding='utf-8') as f:
-
-        writer = csv.writer(f)
-        writer.writerow(['title', 'runtime', 'genre(s)', 'directors', 'writer(s)',
-                        'actor(s)', 'rating(s)', 'number of rating(s)'])
-
-        title_loc = 0
-        year_loc = 1
-        runtime_loc = 2
-        genres_loc = 3
-        directors_loc = 4
-        writers_loc = 5
-        actors_loc = 6
-        rating_loc = 7
-        rate_num_loc = 8
-
-        for index in range(len(movies)):
-            writer.writerow([movies[index][title_loc],
-                            movies[index][runtime_loc],
-                            movies[index][genres_loc],
-                            movies[index][directors_loc],
-                            movies[index][writers_loc],
-                            movies[index][actors_loc],
-                            movies[index][rating_loc],
-                            movies[index][rate_num_loc]])
 
 if __name__ == '__main__':
-    # error when using main():
-        # Traceback (most recent call last):
-        #   File "crawling.py", line 284, in <module>
-        #     main()  # call into the progam
-        #   File "crawling.py", line 123, in main
-        #     top_250_dom = BeautifulSoup(top_250_html, "lxml")
-        #   File "C:\Users\rejev\AppData\Local\Programs\Python\Python37-32\lib\site-packages\beautifulsoup4-4.6.3-py3.7.egg\bs4\__init__.py", line 246, in __init__
-        #     elif len(markup) <= 256 and (
-        # TypeError: object of type 'NoneType' has no len()
+
     main()
-    # html = simple_get(TOP_250_URL)
-    #
-    #
-    # # parse the HTML file into a DOM representation
-    # dom = BeautifulSoup(html, 'html.parser')
-    #
-    # # extract the movies (using the function you implemented)
-    # movie_urls = scrape_top_250(dom)
-    #
-    # movies = []
-    # for movie in movie_urls:
-    #
-    #     html = simple_get(movie)
-    #     # parse the HTML file into a DOM representation
-    #     dom = BeautifulSoup(html, 'html.parser')
-    #     movie_details = scrape_movie_page(dom)
-    #     movies.append(movie_details)
-    #

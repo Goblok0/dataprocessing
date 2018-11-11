@@ -1,6 +1,7 @@
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+import json
 
 OUTPUT_CSV = 'countries.csv'
 INPUT_CSV = 'input.csv'
@@ -65,10 +66,10 @@ def GDP_details(df):
     GDP_mode = df_GDP.mode()
     GDP_std = df_GDP.std()
 
-    print(f"The mean of the GDP is {GDP_mean}")
-    print(f"The median of the GDP is {GDP_median}")
-    print(f"The mode of the GDP is {GDP_mode}")
-    print(f"The standard deviation of the GDP is {GDP_std}")
+    # print(f"The mean of the GDP is {GDP_mean}")
+    # print(f"The median of the GDP is {GDP_median}")
+    # print(f"The mode of the GDP is {GDP_mode}")
+    # print(f"The standard deviation of the GDP is {GDP_std}")
 
     df_GDP.plot.hist(100)
     plt.show()
@@ -79,43 +80,38 @@ def mortality_details(df):
     df_mort.plot.box()
 
     mort_min = df_mort.min()
-    plt.text(1.3, mort_min-3, "min: " + str(mort_min))
-    # print(mort_min)
+    plt.text(0.55, mort_min-3, "min: " + str(mort_min))
+
     mort_max = df_mort.max()
-    plt.text(1.3, mort_max-3, "max: " + str(mort_max))
-    # print(mort_max)
+    plt.text(0.55, mort_max-3, "max: " + str(mort_max))
 
-    # print(mort_median)
-
-    # mort_quantiles = df_mort.quantile([0.25, 0.5, 0.75])
-    firts_quantile = df_mort.quantile([0.25])
+    mort_quantiles = df_mort.quantile([0.25, 0.75])
+    firts_quantile = mort_quantiles.get(0.25)
     plt.text(1.1, firts_quantile-3, "1st quar.: " + str(firts_quantile))
 
     mort_median = df_mort.median()
     plt.text(1.1, mort_median-3, "median: " + str(mort_median))
 
-    third_quantile = df_mort.quantile([0.75])
-    plt.text(1.1, third_quantile-3, "median: " + str(third_quantile))
-
-    df_mort.plot.box()
+    third_quantile = mort_quantiles.get(0.75)
+    plt.text(1.1, third_quantile-3, "3rd quar.: " + str(third_quantile))
 
     plt.show()
 
-    # print(mort_firts_quantile)
-    # print(mort_median)
-    # print(mort_third_quantile)
+def convert(df):
 
+    df.to_json('output.txt')
+    # for row in df:
+    #     country = row['Country']
+    #     region = row['Region']
+    #     pop_density = row['Pop. Density (per sq. mi.)']
+    #     mortality = row['Infant mortality (per 1000 births)']
+    #     GDP = row['GDP ($ per capita) dollars']
 
-
-
-
-
-
-
-
+        # row.to_json()*
 
 
 if __name__ == "__main__":
     df = load()
     GDP_details(df)
     mortality_details(df)
+    convert(df)

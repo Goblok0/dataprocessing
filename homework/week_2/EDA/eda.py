@@ -99,15 +99,23 @@ def mortality_details(df):
 
 def convert(df):
 
-    df.to_json('output.txt')
-    # for row in df:
-    #     country = row['Country']
-    #     region = row['Region']
-    #     pop_density = row['Pop. Density (per sq. mi.)']
-    #     mortality = row['Infant mortality (per 1000 births)']
-    #     GDP = row['GDP ($ per capita) dollars']
+    with open(OUTPUT_CSV, 'r', newline='') as csv_file:
+        reader = csv.DictReader(csv_file)
+        total_dict = {}
 
-        # row.to_json()*
+        for row in reader:
+            country = row['Country']
+            country_dict = {
+                "Region":row['Region'],
+                "Pop. Density(per sq. mi.)":row['Pop.Density(per s. mi.)'],
+                "Infant mortality (per 1000 births)":row['Infant mortality (per 1000 births)'],
+                "GDP":row['GDP ($ per capita) dollars']
+                }
+            total_dict[f"{country}"] = country_dict
+
+
+    with open('data.json', 'w') as outfile:
+        json.dump(total_dict, outfile)
 
 
 if __name__ == "__main__":

@@ -21,33 +21,33 @@ def load():
         with open(INPUT_CSV, newline="") as input_file:
             reader = csv.DictReader(input_file)
 
+            # skips the header
+            next(reader, None)
+
             # iterates through input file and extracts specific data
             for row in reader:
 
                 # check if the current row contains something
                 if row:
 
-                    # isolates the year and rating variables from the current row
+                    # isolates the specific variables from the current row
                     country = row['Country']
                     region = row['Region']
                     pop_density = row['Pop. Density (per sq. mi.)']
                     mortality = row['Infant mortality (per 1000 births)']
                     GDP = row['GDP ($ per capita) dollars']
 
+                    # check if the row is empty
                     if not (country and region and pop_density
                             and mortality and GDP):
-                        continue
-
-                    # check if the current row is the header
-                    if ("Pop" in pop_density or "Infant" in mortality
-                        or "GDP" in GDP):
                         continue
 
                     # check if any of the relevant columns contain data
                     if "unknown" in (pop_density, mortality, GDP):
                         continue
 
-                    # replaces the commas in the string and converts the values to floats
+                    # replaces the commas in the string and
+                    # converts the values to floats
                     pop_density = pop_density.replace(",",".")
                     pop_density = float(pop_density)
 
@@ -80,10 +80,10 @@ def GDP_details(df):
     df_GDP = df_GDP.drop(df_GDP.idxmax())
 
     # calculates the mean, median, mode and standard deviations from the GDP data
-    GDP_mean = df_GDP.mean()
+    GDP_mean = round(df_GDP.mean(), 2)
     GDP_median = df_GDP.median()
     GDP_mode = df_GDP.mode().get(0)
-    GDP_std = df_GDP.std()
+    GDP_std = round(df_GDP.std(), 2)
 
     # prints the calucalated values
     print(f"The mean of the GDP is {GDP_mean}")

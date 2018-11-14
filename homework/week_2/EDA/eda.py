@@ -39,11 +39,9 @@ def load():
                     GDP = row['GDP ($ per capita) dollars']
 
                     # check if any of the row are empty
-                    if not (country and region and pop_density
-                            and mortality and GDP):
-                        continue
-                    # check if any of the relevant columns have missing data
-                    if "unknown" in (pop_density, mortality, GDP):
+                    if (not (country and region and pop_density
+                       and mortality and GDP)
+                       or "unknown" in (pop_density, mortality, GDP)):
                         continue
 
                     # replaces the commas in the string and
@@ -55,6 +53,11 @@ def load():
                     # isolates the numerical value in the string
                     GDP = GDP.split(" ")
                     GDP = int(GDP[0])
+
+                    # check if the GDP of a country exceeds the GDP
+                    # of the country with the highest GDP
+                    if GDP > 55100:
+                        continue
 
                     # writes the info to a new row in the output file
                     writer.writerow([country, region, pop_density,
@@ -75,8 +78,6 @@ def GDP_details(df):
 
     # isolates the GDP column from the dataframe
     df_GDP = df['GDP ($ per capita) dollars']
-    # removes the outlier of this specific dataframe
-    df_GDP = df_GDP.drop(df_GDP.idxmax())
 
     # calculates the mean, median, mode and
     # standard deviations from the GDP data

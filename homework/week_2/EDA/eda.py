@@ -13,6 +13,7 @@ def load():
     it to a new CSV file.
     Makes a pandas dataframe from the the newly made CSV file
     """
+    total_dict = {}
     # creates new output file
     with open(OUTPUT_CSV, 'w', newline='') as output_file:
 
@@ -25,8 +26,6 @@ def load():
         # opens input file
         with open(INPUT_CSV, newline="") as input_file:
             reader = csv.DictReader(input_file)
-            # skips the header
-            next(reader, None)
             # iterates through input file and extracts specific data
             for row in reader:
                 # check if the current row contains something
@@ -62,6 +61,20 @@ def load():
                     # writes the info to a new row in the output file
                     writer.writerow([country, region, pop_density,
                                      mortality, GDP])
+
+                    # Sets the data to a dictionary and adds it to the
+                    # total dictionary for the JSON file
+                    country_dict = {
+                            "Region": region,
+                            "Pop. Density(per sq. mi.)": pop_density,
+                            "Infant mortality (per 1000 births)": mortality,
+                            "GDP": GDP
+                            }
+                    total_dict[f"{country}"] = country_dict
+
+    # converts the total_dict into a JSON file
+    with open('data.json', 'w') as outfile:
+        json.dump(total_dict, outfile)
 
     # creates a pandas dataframe from the output file and returns it
     with open(OUTPUT_CSV, 'r', newline='') as output_file:
@@ -136,36 +149,7 @@ def mortality_details(df):
     plt.show()
 
 
-def convert():
-    """
-    Changes the data in the processed CSV file to a dictionary format and
-    converts it to a json file
-    """
-    # opens the previously made CSV file
-    with open(OUTPUT_CSV, 'r', newline='') as csv_file:
-        # reads the CSV file
-        reader = csv.DictReader(csv_file)
-        total_dict = {}
-        # adds the country details to a dictionary with the country name
-        # as a key in the total_dict
-        for row in reader:
-            country = row['Country']
-            country_dict = {
-                "Region": row['Region'],
-                "Pop. Density(per sq. mi.)": row['Pop.Density(per s. mi.)'],
-                "Infant mortality (per 1000 births)":
-                row['Infant mortality (per 1000 births)'],
-                "GDP": row['GDP ($ per capita) dollars']
-                }
-            total_dict[f"{country}"] = country_dict
-
-    # converts and saves the total_dict to a JSON file
-    with open('data.json', 'w') as outfile:
-        json.dump(total_dict, outfile)
-
-
 if __name__ == "__main__":
     df = load()
     GDP_details(df)
     mortality_details(df)
-    convert()

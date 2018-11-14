@@ -7,7 +7,11 @@ OUTPUT_CSV = 'countries.csv'
 INPUT_CSV = 'input.csv'
 
 def load():
-
+    """
+    Loads and preprocesses the relevant data from the input file and writes
+    it to a new CSV file.
+    Makes a pandas dataframe from the the newly made CSV file
+    """
     # creates new output file
     with open(OUTPUT_CSV, 'w', newline='') as output_file:
 
@@ -37,12 +41,12 @@ def load():
                     mortality = row['Infant mortality (per 1000 births)']
                     GDP = row['GDP ($ per capita) dollars']
 
-                    # check if the row is empty
+                    # check if any of the row are empty
                     if not (country and region and pop_density
                             and mortality and GDP):
                         continue
 
-                    # check if any of the relevant columns contain data
+                    # check if any of the relevant columns have missing data
                     if "unknown" in (pop_density, mortality, GDP):
                         continue
 
@@ -54,8 +58,8 @@ def load():
                     mortality = mortality.replace(",",".")
                     mortality = float(mortality)
 
-                    # splits the numerical from the alpahbetical value in the
-                    # string
+                    # splits and isolates the numerical from the
+                    # alpahbetical value in the string
                     GDP = GDP.split(" ")
                     GDP = int(GDP[0])
 
@@ -69,14 +73,15 @@ def load():
     return df
 
 def GDP_details(df):
+    """
+    Isolates GDP data from the dataframe and calculates the mean, median, mode
+    and standard deviation and creates a histogram of the GDP data
+    """
 
     # isolates the GDP column from the dataframe
     df_GDP = df['GDP ($ per capita) dollars']
 
-    ###
-    ##\
-    ###\#
-    ## necessary to remove outlier?
+    # removes the outlier of this specific dataframe
     df_GDP = df_GDP.drop(df_GDP.idxmax())
 
     # calculates the mean, median, mode and standard deviations from the GDP data
@@ -85,7 +90,7 @@ def GDP_details(df):
     GDP_mode = df_GDP.mode().get(0)
     GDP_std = round(df_GDP.std(), 2)
 
-    # prints the calucalated values
+    # prints the calculated values
     print(f"The mean of the GDP is {GDP_mean}")
     print(f"The median of the GDP is {GDP_median}")
     print(f"The mode of the GDP is {GDP_mode}")
@@ -105,6 +110,10 @@ def GDP_details(df):
     plt.show()
 
 def mortality_details(df):
+    """
+    isolates the mortality data from the dataframe and extracts the minimum,
+    maximum, median and the quantiles from the data and creates a boxplot
+    """
 
     # isolates mortality column from input file
     df_mort = df['Infant mortality (per 1000 births)']
@@ -112,31 +121,41 @@ def mortality_details(df):
     # creates the boxplot of the data
     df_mort.plot.box()
 
-    # calculates and writes the minimal, maximam and quantile values of the
-    # mortality data
+    # calculates and writes the smallest value of the current dataframe
     mort_min = df_mort.min()
     plt.text(0.55, mort_min-3, "min: " + str(mort_min))
 
+    # calculates and writes the largest value in the current dataframe
     mort_max = df_mort.max()
     plt.text(0.55, mort_max-3, "max: " + str(mort_max))
 
+    # calculates the quantiles of the current dataframe
     mort_quantiles = df_mort.quantile([0.25, 0.75])
+
+    # extracts and writes the first quantile into the plot
     firts_quantile = mort_quantiles.get(0.25)
     plt.text(1.1, firts_quantile-3, "1st quar.: " + str(firts_quantile))
 
+    # calculates and writes the median into the plot
     mort_median = df_mort.median()
     plt.text(1.1, mort_median-3, "median: " + str(mort_median))
 
+    # extracts and writes the third quantile into the plot
     third_quantile = mort_quantiles.get(0.75)
     plt.text(1.1, third_quantile-3, "3rd quar.: " + str(third_quantile))
 
-    # writes the labels and title, cant remove suptitle
+    # writes the labels and title
+    # (couldnt find out how to remove the title below the plot)
     plt.ylabel('mortality/1000 births')
     plt.title('Infant mortality in different countries')
 
     plt.show()
 
 def convert(df):
+    """
+    Changes the dataframe data to a dictionary format and converts it
+    to a json file
+    """
 
     # opens the previously made CSV file
     with open(OUTPUT_CSV, 'r', newline='') as csv_file:
@@ -146,8 +165,8 @@ def convert(df):
         total_dict = {}
 
         # for every row creates a dict wth the details of the current
-        # country and places that dict into total_dict with the country name
-        # as a key in total_dict
+        # country. Next, places the country_dict into total_dict with the
+        # country name as a key in total_dict
         for row in reader:
             country = row['Country']
             country_dict = {

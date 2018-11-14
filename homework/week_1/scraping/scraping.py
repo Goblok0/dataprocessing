@@ -38,13 +38,11 @@ def extract_movies(dom):
 
         # isolates the rating from the current section
         for rating in section.find_all('strong'):
-
             # check if the string inside rating is a float/exists, else
             # appends N/A to the rating list
             try:
                 float(rating.string)
                 rating_list.append(rating.string)
-
             except:
                 rating_list.append("N/A")
 
@@ -54,32 +52,26 @@ def extract_movies(dom):
         # check if a string can be extracted from year
         if year.string is None:
             year_list.append("N/A")
-
         else:
             # removes all parentheses from the string
             year = year.string.replace('(','').replace(')','')
-
             # check if two or more words exist in the string
             # selects the year part of the string
             if " " in year:
                 year = year.split(" ")
                 year = year[1]
-
             # check if the isolated year is numeric, else appends N/A
             # to the year_list
             if year.isnumeric():
                 year_list.append(year)
-
             else:
                 year_list.append("N/A")
 
         # isolate actors/actresses to a list per movie
         actors = []
         for actor in section.find_all('a'):
-
             # extracts the link from actor
             url = actor.get('href')
-
             # check if the current link will redirect to an actor
             # and appends it to the actor list
             if "adv_li_st" in url:
@@ -88,7 +80,6 @@ def extract_movies(dom):
         # check if any actors were found in the current section
         if not actors:
             actors = "N/A"
-
         # transforms the list in actors to a single string
         else:
             actors = ', '.join(actors)
@@ -99,12 +90,10 @@ def extract_movies(dom):
         # isolates runtime from the current section
         if section.find_all("span", {"class": "runtime"}):
             runtime = section.find("span", {"class": "runtime"})
-
             # isolates the numeric part of the string and appends
             # it to the runtimes list
             splittime = runtime.string.split()
             runtimes.append(splittime[0])
-
         else:
             runtimes.append("N/A")
 

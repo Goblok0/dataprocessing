@@ -24,17 +24,13 @@ def load():
         # opens input file
         with open(INPUT_CSV, newline="") as input_file:
             reader = csv.DictReader(input_file)
-
             # skips the header
             next(reader, None)
-
             # iterates through input file and extracts specific data
             for row in reader:
-
                 # check if the current row contains something
                 if row:
-
-                    # isolates the specific variables from the current row
+                    # extracts the relevant data in the row
                     country = row['Country']
                     region = row['Region']
                     pop_density = row['Pop. Density (per sq. mi.)']
@@ -45,7 +41,6 @@ def load():
                     if not (country and region and pop_density
                             and mortality and GDP):
                         continue
-
                     # check if any of the relevant columns have missing data
                     if "unknown" in (pop_density, mortality, GDP):
                         continue
@@ -54,12 +49,9 @@ def load():
                     # converts the values to floats
                     pop_density = pop_density.replace(",",".")
                     pop_density = float(pop_density)
-
                     mortality = mortality.replace(",",".")
                     mortality = float(mortality)
-
-                    # splits and isolates the numerical from the
-                    # alpahbetical value in the string
+                    # isolates the numerical value in the string
                     GDP = GDP.split(" ")
                     GDP = int(GDP[0])
 
@@ -80,7 +72,6 @@ def GDP_details(df):
 
     # isolates the GDP column from the dataframe
     df_GDP = df['GDP ($ per capita) dollars']
-
     # removes the outlier of this specific dataframe
     df_GDP = df_GDP.drop(df_GDP.idxmax())
 
@@ -97,12 +88,10 @@ def GDP_details(df):
     print(f"The standard deviation of the GDP is {GDP_std}")
 
     # plots the values to a histogram
-    df_GDP.plot.hist(100)
-
-    # draw mean and median vertical lines
+    df_GDP.plot.hist(14)
+    # draw the mean and median vertical lines in the histogram
     line1 = plt.axvline(GDP_mean, color='b', linestyle='dashed', linewidth=1)
     line2 = plt.axvline(GDP_median, color='r', linestyle='dashed', linewidth=1)
-
     # create legend and labels
     plt.legend((line1, line2), ('mean', 'median'))
     plt.xlabel('GDP ($ per capita) dollars')
@@ -121,33 +110,24 @@ def mortality_details(df):
     # creates the boxplot of the data
     df_mort.plot.box()
 
-    # calculates and writes the smallest value of the current dataframe
+    # finds the lowest and highest mortality values
     mort_min = df_mort.min()
-    plt.text(0.55, mort_min-3, "min: " + str(mort_min))
-
-    # calculates and writes the largest value in the current dataframe
     mort_max = df_mort.max()
-    plt.text(0.55, mort_max-3, "max: " + str(mort_max))
-
     # calculates the quantiles of the current dataframe
     mort_quantiles = df_mort.quantile([0.25, 0.75])
-
-    # extracts and writes the first quantile into the plot
     firts_quantile = mort_quantiles.get(0.25)
-    plt.text(1.1, firts_quantile-3, "1st quar.: " + str(firts_quantile))
-
-    # calculates and writes the median into the plot
     mort_median = df_mort.median()
-    plt.text(1.1, mort_median-3, "median: " + str(mort_median))
-
-    # extracts and writes the third quantile into the plot
     third_quantile = mort_quantiles.get(0.75)
+
+    # writes the calculated data into the plot
+    plt.text(0.55, mort_min-3, "min: " + str(mort_min))
+    plt.text(0.55, mort_max-3, "max: " + str(mort_max))
+    plt.text(1.1, firts_quantile-3, "1st quar.: " + str(firts_quantile))
+    plt.text(1.1, mort_median-3, "median: " + str(mort_median))
     plt.text(1.1, third_quantile-3, "3rd quar.: " + str(third_quantile))
 
     # writes the labels and title
-    # (couldnt find out how to remove the title below the plot)
     plt.ylabel('mortality/1000 births')
-    plt.title('Infant mortality in different countries')
 
     plt.show()
 
@@ -156,17 +136,13 @@ def convert(df):
     Changes the dataframe data to a dictionary format and converts it
     to a json file
     """
-
     # opens the previously made CSV file
     with open(OUTPUT_CSV, 'r', newline='') as csv_file:
-
         # reads the CSV file
         reader = csv.DictReader(csv_file)
         total_dict = {}
-
-        # for every row creates a dict wth the details of the current
-        # country. Next, places the country_dict into total_dict with the
-        # country name as a key in total_dict
+        # adds the country details to a dictionary with the country name
+        # as a key in the total_dict
         for row in reader:
             country = row['Country']
             country_dict = {

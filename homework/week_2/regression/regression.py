@@ -68,7 +68,6 @@ def regression(df):
     model = lm.fit(x, y)
     m = model.coef_[0][0]
     b = model.intercept_[0]
-
     print(f"formula: y = {m}x + {b}")
 
     # draw correlation line

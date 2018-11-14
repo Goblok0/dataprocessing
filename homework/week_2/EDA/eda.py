@@ -6,6 +6,7 @@ import json
 OUTPUT_CSV = 'countries.csv'
 INPUT_CSV = 'input.csv'
 
+
 def load():
     """
     Loads and preprocesses the relevant data from the input file and writes
@@ -47,22 +48,24 @@ def load():
 
                     # replaces the commas in the string and
                     # converts the values to floats
-                    pop_density = pop_density.replace(",",".")
+                    pop_density = pop_density.replace(",", ".")
                     pop_density = float(pop_density)
-                    mortality = mortality.replace(",",".")
+                    mortality = mortality.replace(",", ".")
                     mortality = float(mortality)
                     # isolates the numerical value in the string
                     GDP = GDP.split(" ")
                     GDP = int(GDP[0])
 
                     # writes the info to a new row in the output file
-                    writer.writerow([country, region, pop_density, mortality, GDP])
+                    writer.writerow([country, region, pop_density,
+                                     mortality, GDP])
 
     # creates a pandas dataframe from the output file and returns it
     with open(OUTPUT_CSV, 'r', newline='') as output_file:
         df = pd.read_csv(output_file)
 
     return df
+
 
 def GDP_details(df):
     """
@@ -75,7 +78,8 @@ def GDP_details(df):
     # removes the outlier of this specific dataframe
     df_GDP = df_GDP.drop(df_GDP.idxmax())
 
-    # calculates the mean, median, mode and standard deviations from the GDP data
+    # calculates the mean, median, mode and
+    # standard deviations from the GDP data
     GDP_mean = round(df_GDP.mean(), 2)
     GDP_median = df_GDP.median()
     GDP_mode = df_GDP.mode().get(0)
@@ -97,6 +101,7 @@ def GDP_details(df):
     plt.xlabel('GDP ($ per capita) dollars')
 
     plt.show()
+
 
 def mortality_details(df):
     """
@@ -120,16 +125,17 @@ def mortality_details(df):
     third_quantile = mort_quantiles.get(0.75)
 
     # writes the calculated data into the plot
-    plt.text(0.55, mort_min-3, "min: " + str(mort_min))
-    plt.text(0.55, mort_max-3, "max: " + str(mort_max))
-    plt.text(1.1, firts_quantile-3, "1st quar.: " + str(firts_quantile))
-    plt.text(1.1, mort_median-3, "median: " + str(mort_median))
-    plt.text(1.1, third_quantile-3, "3rd quar.: " + str(third_quantile))
+    plt.text(0.55, mort_min - 3, "min: " + str(mort_min))
+    plt.text(0.55, mort_max - 3, "max: " + str(mort_max))
+    plt.text(1.1, firts_quantile - 3, "1st quar.: " + str(firts_quantile))
+    plt.text(1.1, mort_median - 3, "median: " + str(mort_median))
+    plt.text(1.1, third_quantile - 3, "3rd quar.: " + str(third_quantile))
 
     # writes the labels and title
     plt.ylabel('mortality/1000 births')
 
     plt.show()
+
 
 def convert(df):
     """
@@ -146,10 +152,11 @@ def convert(df):
         for row in reader:
             country = row['Country']
             country_dict = {
-                "Region":row['Region'],
-                "Pop. Density(per sq. mi.)":row['Pop.Density(per s. mi.)'],
-                "Infant mortality (per 1000 births)":row['Infant mortality (per 1000 births)'],
-                "GDP":row['GDP ($ per capita) dollars']
+                "Region": row['Region'],
+                "Pop. Density(per sq. mi.)": row['Pop.Density(per s. mi.)'],
+                "Infant mortality (per 1000 births)":
+                row['Infant mortality (per 1000 births)'],
+                "GDP": row['GDP ($ per capita) dollars']
                 }
             total_dict[f"{country}"] = country_dict
 

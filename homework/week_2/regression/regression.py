@@ -19,8 +19,6 @@ def load():
         # opens input file
         with open(INPUT_CSV, newline="") as input_file:
             reader = csv.DictReader(input_file)
-            # skips the header
-            next(reader, None)
             # iterates through input file and extracts specific data
             for row in reader:
                 # check if the current row contains something
@@ -57,12 +55,14 @@ def regression(df):
 
     # load data
     data = pd.read_csv("agriculture.csv")
+
     # shape data to a usable format
     matrix = np.matrix(data)
     x, y = matrix[:, 2], matrix[:, 3]
     x = np.array(x)
     y = np.array(y)
     x, y = x.reshape(-1, 1), y.reshape(-1, 1)
+
     # create model
     lm = linear_model.LinearRegression()
     model = lm.fit(x, y)

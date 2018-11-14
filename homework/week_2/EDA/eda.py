@@ -50,10 +50,10 @@ def load():
                     pop_density = float(pop_density)
                     mortality = mortality.replace(",", ".")
                     mortality = float(mortality)
+
                     # isolates the numerical value in the string
                     GDP = GDP.split(" ")
                     GDP = int(GDP[0])
-
                     # check if the GDP of a country exceeds the GDP
                     # of the country with the highest GDP
                     if GDP > 55100:
@@ -132,16 +132,14 @@ def mortality_details(df):
     plt.text(1.1, mort_median - 3, "median: " + str(mort_median))
     plt.text(1.1, third_quantile - 3, "3rd quar.: " + str(third_quantile))
 
-    # writes the labels and title
     plt.ylabel('mortality/1000 births')
-
     plt.show()
 
 
-def convert(df):
+def convert():
     """
-    Changes the dataframe data to a dictionary format and converts it
-    to a json file
+    Changes the data in the processed CSV file to a dictionary format and
+    converts it to a json file
     """
     # opens the previously made CSV file
     with open(OUTPUT_CSV, 'r', newline='') as csv_file:
@@ -170,4 +168,4 @@ if __name__ == "__main__":
     df = load()
     GDP_details(df)
     mortality_details(df)
-    convert(df)
+    convert()

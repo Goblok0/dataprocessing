@@ -1,3 +1,10 @@
+# made by: julian Evalle
+# opdr: regression
+#
+# This program isolates specific colums from the input file and creates a
+# linear regression plot of the percentage arable land and the amount of
+# agriculture in the economic sector
+
 import csv
 import pandas as pd
 import numpy as np

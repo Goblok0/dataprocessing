@@ -1,3 +1,10 @@
+# Made By: Julian Evalle
+# opdr: EDA
+#
+# This program processes an input file with specific data and isolates the data
+# to a JSON file and creates a histogram of the country GDP and a boxplot of
+# the mortality per 1000 births
+
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt

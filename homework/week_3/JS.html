@@ -1,0 +1,25 @@
+<head>
+  <title>BananaSlamma</title>
+</head>
+<body>
+    <canvas>
+    </canvas>
+    <script>
+      console.log("I hate flamingos");
+      var fileName = "data.json";
+      var txtFile = new XMLHttpRequest();
+      txtFile.onreadystatechange = function() {
+          if (txtFile.readyState === 4 && txtFile.status == 200) {
+              console.log(JSON.parse(txtFile.responseText));
+          }
+      }
+      txtFile.open("GET", fileName);
+      txtFile.send();
+
+      KeyArray = Object.keys(txtFile)
+      console.log(KeyArray)
+      KeyNum = KeyArray.length;
+      console.log(KeyNum)
+
+    </script>
+</body>

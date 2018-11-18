@@ -9,15 +9,14 @@ def convert():
     with open(INPUT_CSV, 'r') as input_file:
         reader = csv.DictReader(input_file)
 
-
-        id = 0
-        for row in reader:
+        # id = 0
+        for id, row in enumerate(reader):
             if row:
                 sub_dict = {}
                 for header in list(reader.fieldnames):
                     sub_dict[header] = row[header]
                     tot_dict[id] = sub_dict
-                    id += 1
+                    # id += 1
 
     with open('data.json', 'w') as outfile:
         json.dump(tot_dict, outfile)

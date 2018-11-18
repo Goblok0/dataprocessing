@@ -1,0 +1,17 @@
+1. Explain the difference between the == operator and the === operator.
+    the == operator checks if the values on the left and right are equivalent
+    the === operator checks if the two values are exactly the same
+
+2. Explain what a closure is. (Note that JavaScript programs use closures very often)
+    a function which keeps tracks of the variables defined inside of it,
+    regardless whether the function is called upon on seperate moments in the
+    script
+
+3. Explain what higher order functions are.
+    a function that can take and return another function
+
+4. Explain what a query selector is and give an example line of JavaScript that uses a query selector.
+    a query selector is a function which can find the first element in the DOM
+    using the given selector or a group of selectors.
+
+    file.querySelector(".id")

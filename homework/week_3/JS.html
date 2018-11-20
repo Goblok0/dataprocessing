@@ -1,25 +1,131 @@
 <head>
   <title>BananaSlamma</title>
+  <script>
+    function draw() {
+      var canvas = document.getElementById('canvas');
+      if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+
+        // // draw square
+        // ctx.fillStyle = 'rgb(0, 0, 100)';
+        // // x loc, y loc, x length, y length
+        // ctx.fillRect(100, 100, 200, 200);
+
+        // draw text
+        ctx.fillText("50,50",50,50)
+        ctx.fillText("100,100",100,100)
+        ctx.fillText("150,150",150,150)
+        ctx.fillText("200,200",200,200)
+        ctx.fillText("250,250",250,250)
+
+
+        // draw line
+        ctx.beginPath();       // Start a new path
+        ctx.moveTo(50, 50);    // Move the pen to {50, 50}
+        ctx.lineTo(250, 250);  // Draw a line to {150, 100}
+        ctx.stroke();          // Render the path
+
+      }
+    }
+  </script>
 </head>
-<body>
-    <canvas>
-    </canvas>
+<body onload="draw();">
+    <canvas id="canvas" width="750" height="500"></canvas>
     <script>
+      var data;
       console.log("I hate flamingos");
       var fileName = "data.json";
       var txtFile = new XMLHttpRequest();
       txtFile.onreadystatechange = function() {
           if (txtFile.readyState === 4 && txtFile.status == 200) {
-              console.log(JSON.parse(txtFile.responseText));
+              data = JSON.parse(txtFile.responseText);
+
+              var totDict = {}
+
+              for (let key of Object.keys(data)){
+                // console.log(data[key])
+                var title = data[key].Title;
+                splitted = title.split("(");
+                // console.log(splitted)
+                var title = splitted[0]
+                var year = splitted[1].replace(")","")
+
+                // console.log(year)
+                var genres = [];
+
+                if (!(data[key].Genre1.length == 0)){
+                  genres.push(data[key].Genre1);
+                }
+                if (!(data[key].Genre2.length == 0)){
+                  genres.push(data[key].Genre2);
+                }
+                if (!(data[key].Genre3.length == 0)){
+                  genres.push(data[key].Genre3);
+                }
+                // // year-genre-movie
+                // if (!totDict[year]){
+                //   totDict[year] = {}
+                // }
+                //
+                // var inYear = totDict[year]
+                // for (let genre of genres){
+                //   if (!(inYear[genre])){
+                //     inYear[genre] = []
+                //   }
+                //   inYear[genre].push(title);
+                // }
+                // genre-year-movie
+
+                for (let genre of genres){
+                  if (!totDict[genre]){
+                    totDict[genre] = {}
+                  }
+                  var inGenre = totDict[genre]
+
+                  if (!(inGenre[year])){
+                    inGenre[year] = []
+                  }
+                  inGenre[year].push(title);
+                }
+              }
+              console.log(totDict)
+              //
+              // for (let genre in totDict){
+              //   alert(genre)
+
           }
       }
+
       txtFile.open("GET", fileName);
       txtFile.send();
 
-      KeyArray = Object.keys(txtFile)
-      console.log(KeyArray)
-      KeyNum = KeyArray.length;
-      console.log(KeyNum)
-
     </script>
+
+
+    <script>
+      function createTransform(domain, range){
+      	// domain is a two-element array of the data bounds [domain_min, domain_max]
+      	// range is a two-element array of the screen bounds [range_min, range_max]
+      	// this gives you two equations to solve:
+      	// range_min = alpha * domain_min + beta
+      	// range_max = alpha * domain_max + beta
+       		// a solution would be:
+
+          var domain_min = domain[0]
+          var domain_max = domain[1]
+          var range_min = range[0]
+          var range_max = range[1]
+
+          // formulas to calculate the alpha and the beta
+         	var alpha = (range_max - range_min) / (domain_max - domain_min)
+          var beta = range_max - alpha * domain_max
+
+          // returns the function for the linear transformation (y= a * x + b)
+          return function(x){
+            return alpha * x + beta;
+          }
+      }
+    </script>
+
+
 </body>

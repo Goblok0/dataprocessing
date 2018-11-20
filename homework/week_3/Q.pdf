@@ -4,7 +4,7 @@
 
 2. Explain what a closure is. (Note that JavaScript programs use closures very often)
     a function which keeps tracks of the variables defined inside of it,
-    regardless whether the function is called upon on seperate moments in the
+    regardless whether the function is called upon on separate moments in the
     script
 
 3. Explain what higher order functions are.

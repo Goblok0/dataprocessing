@@ -63,46 +63,52 @@
                 }
               }
               console.log(totDict)
-              data = []
+              var data = []
               for (var genre in totDict){
-                // alert(genre)
+                // order: genre - year - #movies
                 genreData = []
-                genreData.push(`${genre}`);
+                yearList = []
+                movieList = []
+
                 var inGenre = totDict[genre]
                 // console.log(inGenre)
                 console.log(`${genre}`)
                 for (const [year, movies] of Object.entries(inGenre)){
-                  // genreData.push(year)
-                  // console.log(year)
-                  // console.log(genre)
-                  console.log(movies.length)
+                  yearList.push(year)
+                  movieList.push(movies.length)
                 }
+                // console.log(genreData)
+                genreData.push(`${genre}`);
+                genreData.push(yearList)
+                genreData.push(movieList)
+                data.push(genreData)
+              }
+              console.log(data)
 
+              window.onload = function() {
+                var chart = new CanvasJS.chart("chartContainer",{
+                  title: {
+                          text: "Prevalance of genres in popular movies"
+                  },
+                  axisX: {
+                          valueFormatString: "Years"
+                  },
+                  axisY2: {
+                          title: "Frequency"
+                  },
+                  for (genre of data)
+                  data: [
+                  {
+                    type: "line",
+                    name: `${genre}`
+                    dataPoints: [
+                    {
 
-
-      //         window.onload = function() {
-      //           var chart = new CanvasJS.chart("chartContainer",{
-      //             title: {
-      //                     text: "Prevalance of genres in popular movies"
-      //             },
-      //             axisX: {
-      //                     valueFormatString: "Years"
-      //             },
-      //             axisY2: {
-      //                     title: "Frequency"
-      //             },
-      //             data: [
-      //             {
-      //               type: "line",
-      //               name: "genroe"
-      //               dataPoints: [
-      //               {
-      //
-      //               }
-      //               ]
-      //             }
-      //             ]
-      //           })
+                    }
+                    ]
+                  }
+                  ]
+                })
               }
           }
       }

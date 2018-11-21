@@ -17,7 +17,7 @@
               var totDict = {}
 
               for (let key of Object.keys(data)){
-                // console.log(data[key])
+                console.log(data[key])
                 var title = data[key].Title;
                 splitted = title.split("(");
                 // console.log(splitted)
@@ -36,6 +36,19 @@
                 if (!(data[key].Genre3.length == 0)){
                   genres.push(data[key].Genre3);
                 }
+                // // year-genre-movie
+                // if (!totDict[year]){
+                //   totDict[year] = {}
+                // }
+                //
+                // var inYear = totDict[year]
+                // for (let genre of genres){
+                //   if (!(inYear[genre])){
+                //     inYear[genre] = []
+                //   }
+                //   inYear[genre].push(title);
+                // }
+                // genre-year-movie
 
                 for (let genre of genres){
                   if (!totDict[genre]){
@@ -50,32 +63,29 @@
                 }
               }
               console.log(totDict)
-              var chartData = []
-
+              var data = []
               for (var genre in totDict){
                 // order: genre - year - #movies
                 genreData = {}
-                genreData["type"] = "line"
-                genreData["name"] = `${genre}`
-                genreData["showInLegend"] = true;
-                // genreData["markerSize"] = 0;
+                yearList = []
+                movieList = []
 
-                dataPoints = []
                 var inGenre = totDict[genre]
+                // console.log(inGenre)
+                // console.log(`${genre}`)
                 for (const [year, movies] of Object.entries(inGenre)){
-                  coordinates = {}
-                  coordinates["x"] = `${year}`
-                  coordinates["y"] = `${movies.length}`
-                  dataPoints.push(coordinates)
+                  yearList.push(`x: ${year}`)
+                  movieList.push(`y: ${movies.length}`)
                 }
                 // console.log(genreData)
-                genreData["dataPoints"] = dataPoints
-                chartData.push(genreData)
+                genreData.push(`${genre}`);
+                genreData.push(yearList)
+                genreData.push(movieList)
+                data.push(genreData)
               }
-              console.log(chartData)
-              for (genre of chartData){
+              for (genre of data){
                 console.log(genre)
-                console.log(genre["dataPoints"])
+                console.log(genre[1])
               }
 
 
@@ -93,8 +103,11 @@
               //     },
               //
               //     data: [{
-              //       for (genre of chartData){
+              //       for (genre of data){
+              //         type: "line",
+              //         name: `${genre}`
               //
+              //         dataPoints: [
               //         {
               //
               //         }
@@ -105,7 +118,6 @@
               //     ]
               //   })
               // }
-              // // ----------
           }
       }
 

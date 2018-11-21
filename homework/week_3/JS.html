@@ -1,32 +1,28 @@
 <head>
   <title>BananaSlamma</title>
-  <script>
-
-
-
-  </script>
 </head>
 <body>
     <script>
-      var data;
+      // loads the data and plots into a line-graph
       var fileName = "data.json";
       var txtFile = new XMLHttpRequest();
       txtFile.onreadystatechange = function() {
           if (txtFile.readyState === 4 && txtFile.status == 200) {
-              data = JSON.parse(txtFile.responseText);
+              const data = JSON.parse(txtFile.responseText);
 
-              var totDict = {}
+              var totDict = {};
+              // extracts the relevant data from the JSON file
               for (let key of Object.keys(data)){
-                // console.log(data[key])
                 var title = data[key].Title;
+
+                // seperates the title and year
                 splitted = title.split("(");
-                // console.log(splitted)
-                var title = splitted[0]
-                var year = splitted[1].replace(")","")
+                var title = splitted[0];
+                var year = splitted[1].replace(")","");
 
-                // console.log(year)
                 var genres = [];
-
+                // checks if the genre column contains any data and
+                // assigns it to the genres list
                 if (!(data[key].Genre1.length == 0)){
                   genres.push(data[key].Genre1);
                 }
@@ -37,28 +33,30 @@
                   genres.push(data[key].Genre3);
                 }
 
+                // create a dict for each newly found genre and places the
+                // movie title in each genre dict it belongs to
                 for (let genre of genres){
                   if (!totDict[genre]){
-                    totDict[genre] = {}
+                    totDict[genre] = {};
                   }
                   var inGenre = totDict[genre]
 
                   if (!(inGenre[year])){
-                    inGenre[year] = []
+                    inGenre[year] = [];
                   }
                   inGenre[year].push(title);
                 }
               }
-              console.log(totDict)
 
-              var chartData = []
+              // reorganizes the extracted data to a structure easier to plot
+              var chartData = [];
               for (var genre in totDict){
-                // order: genre - year - #movies
-                genreData = {}
+                genreData = {};
                 genreData["name"] = `${genre}`
 
                 dataPoints = []
                 var inGenre = totDict[genre]
+                // assigns x and y values for each genre into a dict
                 for (const [year, movies] of Object.entries(inGenre)){
                   coordinates = {}
                   coordinates["x"] = `${year}`
@@ -68,125 +66,133 @@
                 genreData["dataPoints"] = dataPoints
                 chartData.push(genreData)
               }
-              console.log(chartData)
 
-
-
-              data0 = chartData[0]["dataPoints"]
-              // data1 = data0["dataPoints"]
-              console.log(data0)
-              // var data =
-              // for var i = 0; i< llength; i++
+              // creates the graph
               var canvas = document.getElementById('graph')
               var ctx = canvas.getContext('2d')
-              // crc = CanvasRenderingContext2D
-              ctx.fillText("MEH",50,50)
-              ctx.font = '50px serif';
-              ctx.strokeText("mah",100,100)
-              ctx.beginPath();
-              ctx.moveTo(50,50)
-              ctx.lineTo(200,200)
-              ctx.stroke();
 
-              var yGraph = 300
-              var xGraph = 400
-              console.log(yGraph)
-              var xPadding = 30
-              var yPadding = 30
+              var startYear = 2010;
+              var xGraph = canvas.width;
+              var yGraph = canvas.height;
+
+              // assigns dynamic padding variables
+              var xPad = xGraph / (14 + 2 / 3);
+              var xPadBig = xPad + (xGraph / 22);
+              var yPad = yGraph / 12;
+              var yPadBig = yGraph - yPad;
+              var yCalc = (yGraph - 2 * yPad)/16;
 
               ctx.beginPath();
-              ctx.moveTo(xPadding, 0)
 
-              ctx.lineTo(xPadding, yGraph - yPadding)
-              ctx.lineTo(xGraph, yGraph - yPadding)
-              ctx.stroke();
-
-              var canvas = document.getElementById('graph2')
-              var ctx = canvas.getContext('2d')
-              // ctx. transform(1,0,0,-1,0,canvas.height)
-
-              var xGraph = 1100
-              var yGraph = 600
-
-              var xPad = 75
-              var yPad = 50
-
-              ctx.beginPath();
-              ctx.moveTo(xPad, 50)
-
+              // creates the y and x axis of the plot
+              ctx.moveTo(xPad, 50);
               // y-axis
-              ctx.lineTo(xPad, yGraph - yPad)
+              ctx.lineTo(xPad, yPadBig);
               // x-axis
-              ctx.lineTo(xGraph-50, yGraph - yPad)
-              ctx.stroke();
+              ctx.lineTo(xGraph - xPadBig, yPadBig);
 
-              data0 = chartData[0]["dataPoints"]
-              // .length = 7
-              // console.log(data0)
-              // x:y:
-              // console.log(data0[0])
-
+              //draws the x-label
+              ctx.font = '20px georgia';
+              ctx.fillText("year", xGraph * 0.5, yGraph - (yPad * 0.25));
               // draws the rotated y-label
-              ctx.fillText("year", xGraph * 0.5, yGraph - yPad + 30 )
               ctx.save();
               ctx.translate(0, 0);
               ctx.rotate(Math.PI/2);
-              ctx.fillText("frequency", yGraph * 0.5, -xPad * 0.4 )
-              ctx.restore()
+              ctx.fillText("frequency", yGraph * 0.4, -xPad * 0.35 );
+              ctx.restore();
 
-              // set x labels
+              ctx.font = '15px georgia'
+              ctx.strokeStyle = "#D3D3D3"
+
+              // sets x labels and vertical background lines
               for(var i = 0; i < 7; i++){
-                ctx.fillText(i + 2010, xPad + 50 + ((yGraph / 4.5) * i), yGraph-yPad + 20 )
-              }
-              // set y labels
-              for(var i = 0; i < 11; i++){
-                ctx.fillText(i, yPad, yGraph - yPad - ((xGraph/22.5)*i))
+                ctx.fillText(i + startYear, xPadBig + (yGraph / 4.5 * i),
+                             yGraph * 0.95)
+                let xCoord = xPadBig + (xGraph / 8 * i)
+                ctx.moveTo(xCoord, yPadBig);
+                ctx.lineTo(xCoord, 0 + yPad);
               }
 
+              // sets y labels and horizontal background lines
+              for(var i = 1; i < 16; i++){
+                let yCoord = yPadBig - (yCalc * i)
+                ctx.fillText(i, xPad * 0.65, yCoord)
+                ctx.moveTo(xPad, yCoord);
+                ctx.lineTo(xGraph - xPadBig, yCoord);
+              }
+              ctx.stroke();
+
+              // draws the title
+              ctx.font = '25px georgia';
+              ctx.strokeStyle = "#000000";
+              ctx.strokeText("The amount of high-rated movies within" +
+                             " a specific genre per year",
+                             xGraph * 0.2, yGraph * 0.05)
+
+              var index = 0;
               for (genre of chartData){
-                // console.log(genre)
-                // console.log(genre["dataPoints"])
-                // console.log(genre["dataPoints"][0])
-                // die("meh")
-                for (var i = 0; i < genre["dataPoints"].length; i++){
-                  console.log(genre["dataPoints"][i].x)
-                  // console.log(point.x)
+                // picks a colour for the current genre line
+                chosenColour = colourPicker(index)
+                ctx.strokeStyle = `${chosenColour}`
 
-                  xBegin = parseInt(genre["dataPoints"][i].x) - 2010
-                  yBegin = parseInt(genre["dataPoints"][i].y)
-                  //
-                  // if (genre["dataPoints"][i+1].x == null){
-                  //   break;
-                  }
-                  try{
-                    xEnd = parseInt(genre["dataPoints"][i+1].x) - 2010
-                    console.log(xEnd)
-                    yEnd = parseInt(genre["dataPoints"][i+1].y)
-                  }
-                  finally{
-                    continue;
-                  }
-                  ctx.beginPath();
-                  ctx.moveTo(xPad + 50 + (yGraph / 4.5) * xBegin, yGraph - yPad - (xGraph/22.5*yBegin))
-                  ctx.lineTo(xPad + 50 + (yGraph / 4.5) * xEnd + 1, yGraph - yPad - (xGraph/22.5 * yEnd) + 1)
+                // create the legend for the current genre
+                ctx.beginPath();
+                let yCoordLegendLine = yGraph * 0.03 * index + yGraph * 0.1;
+                ctx.moveTo(xGraph * 0.9, yCoordLegendLine);
+                ctx.lineTo(xGraph * 0.91, yCoordLegendLine);
+                ctx.stroke();
+                ctx.font = '10px calibri';
+                ctx.fillText(genre.name, xGraph * 0.92,
+                             yGraph * 0.03 * index + yGraph * 0.105);
 
-                  console.log(xPad + 50 + (yGraph / 4.5) * xBegin)
-                  console.log(xPad + 50 + (yGraph / 4.5) * xEnd + 1)
+                // plots the line for the current genre
+                ctx.beginPath();
+                var lengthCoordinates = genre["dataPoints"].length;
+                for (var i = 0; i < (lengthCoordinates - 1); i++){
+                  // extracts the begin and end coordinates for each
+                  // individual line in the plotted line
+                  var xBegin = parseInt(genre["dataPoints"][i].x) - startYear;
+                  var yBegin = parseInt(genre["dataPoints"][i].y);
+                  var xEnd = parseInt(genre["dataPoints"][i+1].x) - startYear;
+                  var yEnd = parseInt(genre["dataPoints"][i+1].y);
 
+                  // if (xEnd - xBegin > 1){
+                  //   for (let j = 0; j < (xEnd-xBegin); j++)
+                  //     ctx.moveTo(xPadBig + (xGraph / 8 * xBegin),
+                  //               yPadBig - ((yCalc * yBegin)))
+                  //     ctx.lineTo(xPadBig + (xGraph / 8 * xEnd),
+                  //               yPadBig)
+                  //      yBegin = 0;
+                  // }
+
+                  // draws individual line
+                  ctx.moveTo(xPadBig + (xGraph / 8 * xBegin),
+                            yPadBig - ((yCalc * yBegin)))
+                  ctx.lineTo(xPadBig + (xGraph / 8 * xEnd),
+                            yPadBig - ((yCalc * yEnd)))
                   ctx.stroke();
                 }
-                // for ()
+                index += 1
               }
-
+              ctx.strokeStyle = "#000000"
+              ctx.strokeRect(xGraph * 0.89, yGraph * 0.03 * index + yGraph * 0.1,
+                            (xGraph * 0.1), -(yGraph * 0.031 * index))
+            }
           }
-
-
       txtFile.open("GET", fileName);
       txtFile.send();
-      // <canvas id="canvas" width="750" height="500"></canvas>
-      // chart.render();
+
+      // returns a hexadecimal colour
+      const colourPicker = function(x){
+        var colourArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+                          '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+                          '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
+                          '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC']
+        picker = colourArray[x]
+        return picker
+      }
+
     </script>
-    <canvas id = "graph2" width="1100" height="600" style="border: 1px solid #000000"></canvas>
-    <canvas id = "graph" width="400" height="300" style="border: 1px solid #000000"></canvas>
+    <canvas id = "graph" width="1100" height="600" style="border: 1px solid #000000"></canvas>
 
 </body>

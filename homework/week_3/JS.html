@@ -3,10 +3,11 @@
   <script>
 
 
+
   </script>
 </head>
 <body>
-    <script type="text/javascript">
+    <script>
       var data;
       var fileName = "data.json";
       var txtFile = new XMLHttpRequest();
@@ -15,7 +16,6 @@
               data = JSON.parse(txtFile.responseText);
 
               var totDict = {}
-
               for (let key of Object.keys(data)){
                 // console.log(data[key])
                 var title = data[key].Title;
@@ -50,15 +50,12 @@
                 }
               }
               console.log(totDict)
-              var chartData = []
 
+              var chartData = []
               for (var genre in totDict){
                 // order: genre - year - #movies
                 genreData = {}
-                genreData["type"] = "line"
                 genreData["name"] = `${genre}`
-                genreData["showInLegend"] = true;
-                // genreData["markerSize"] = 0;
 
                 dataPoints = []
                 var inGenre = totDict[genre]
@@ -68,50 +65,128 @@
                   coordinates["y"] = `${movies.length}`
                   dataPoints.push(coordinates)
                 }
-                // console.log(genreData)
                 genreData["dataPoints"] = dataPoints
                 chartData.push(genreData)
               }
               console.log(chartData)
-              for (genre of chartData){
-                console.log(genre)
-                console.log(genre["dataPoints"])
+
+
+
+              data0 = chartData[0]["dataPoints"]
+              // data1 = data0["dataPoints"]
+              console.log(data0)
+              // var data =
+              // for var i = 0; i< llength; i++
+              var canvas = document.getElementById('graph')
+              var ctx = canvas.getContext('2d')
+              // crc = CanvasRenderingContext2D
+              ctx.fillText("MEH",50,50)
+              ctx.font = '50px serif';
+              ctx.strokeText("mah",100,100)
+              ctx.beginPath();
+              ctx.moveTo(50,50)
+              ctx.lineTo(200,200)
+              ctx.stroke();
+
+              var yGraph = 300
+              var xGraph = 400
+              console.log(yGraph)
+              var xPadding = 30
+              var yPadding = 30
+
+              ctx.beginPath();
+              ctx.moveTo(xPadding, 0)
+
+              ctx.lineTo(xPadding, yGraph - yPadding)
+              ctx.lineTo(xGraph, yGraph - yPadding)
+              ctx.stroke();
+
+              var canvas = document.getElementById('graph2')
+              var ctx = canvas.getContext('2d')
+              // ctx. transform(1,0,0,-1,0,canvas.height)
+
+              var xGraph = 1100
+              var yGraph = 600
+
+              var xPad = 75
+              var yPad = 50
+
+              ctx.beginPath();
+              ctx.moveTo(xPad, 50)
+
+              // y-axis
+              ctx.lineTo(xPad, yGraph - yPad)
+              // x-axis
+              ctx.lineTo(xGraph-50, yGraph - yPad)
+              ctx.stroke();
+
+              data0 = chartData[0]["dataPoints"]
+              // .length = 7
+              // console.log(data0)
+              // x:y:
+              // console.log(data0[0])
+
+              // draws the rotated y-label
+              ctx.fillText("year", xGraph * 0.5, yGraph - yPad + 30 )
+              ctx.save();
+              ctx.translate(0, 0);
+              ctx.rotate(Math.PI/2);
+              ctx.fillText("frequency", yGraph * 0.5, -xPad * 0.4 )
+              ctx.restore()
+
+              // set x labels
+              for(var i = 0; i < 7; i++){
+                ctx.fillText(i + 2010, xPad + 50 + ((yGraph / 4.5) * i), yGraph-yPad + 20 )
+              }
+              // set y labels
+              for(var i = 0; i < 11; i++){
+                ctx.fillText(i, yPad, yGraph - yPad - ((xGraph/22.5)*i))
               }
 
+              for (genre of chartData){
+                // console.log(genre)
+                // console.log(genre["dataPoints"])
+                // console.log(genre["dataPoints"][0])
+                // die("meh")
+                for (var i = 0; i < genre["dataPoints"].length; i++){
+                  console.log(genre["dataPoints"][i].x)
+                  // console.log(point.x)
 
+                  xBegin = parseInt(genre["dataPoints"][i].x) - 2010
+                  yBegin = parseInt(genre["dataPoints"][i].y)
+                  //
+                  // if (genre["dataPoints"][i+1].x == null){
+                  //   break;
+                  }
+                  try{
+                    xEnd = parseInt(genre["dataPoints"][i+1].x) - 2010
+                    console.log(xEnd)
+                    yEnd = parseInt(genre["dataPoints"][i+1].y)
+                  }
+                  finally{
+                    continue;
+                  }
+                  ctx.beginPath();
+                  ctx.moveTo(xPad + 50 + (yGraph / 4.5) * xBegin, yGraph - yPad - (xGraph/22.5*yBegin))
+                  ctx.lineTo(xPad + 50 + (yGraph / 4.5) * xEnd + 1, yGraph - yPad - (xGraph/22.5 * yEnd) + 1)
 
-              // window.onload = function() {
-              //   var chart = new CanvasJS.chart("chartContainer",{
-              //     title: {
-              //             text: "Prevalance of genres in popular movies"
-              //     },
-              //     axisX: {
-              //             valueFormatString: "Year"
-              //     },
-              //     axisY2: {
-              //             title: "Frequency"
-              //     },
-              //
-              //     data: [{
-              //       for (genre of chartData){
-              //
-              //         {
-              //
-              //         }
-              //         ]
-              //       }
-              //
-              //     }
-              //     ]
-              //   })
-              // }
-              // // ----------
+                  console.log(xPad + 50 + (yGraph / 4.5) * xBegin)
+                  console.log(xPad + 50 + (yGraph / 4.5) * xEnd + 1)
+
+                  ctx.stroke();
+                }
+                // for ()
+              }
+
           }
-      }
+
 
       txtFile.open("GET", fileName);
       txtFile.send();
       // <canvas id="canvas" width="750" height="500"></canvas>
       // chart.render();
     </script>
+    <canvas id = "graph2" width="1100" height="600" style="border: 1px solid #000000"></canvas>
+    <canvas id = "graph" width="400" height="300" style="border: 1px solid #000000"></canvas>
+
 </body>

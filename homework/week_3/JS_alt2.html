@@ -1,0 +1,117 @@
+<head>
+  <title>BananaSlamma</title>
+  <script>
+
+
+  </script>
+</head>
+<body>
+    <script type="text/javascript">
+      var data;
+      var fileName = "data.json";
+      var txtFile = new XMLHttpRequest();
+      txtFile.onreadystatechange = function() {
+          if (txtFile.readyState === 4 && txtFile.status == 200) {
+              data = JSON.parse(txtFile.responseText);
+
+              var totDict = {}
+
+              for (let key of Object.keys(data)){
+                // console.log(data[key])
+                var title = data[key].Title;
+                splitted = title.split("(");
+                // console.log(splitted)
+                var title = splitted[0]
+                var year = splitted[1].replace(")","")
+
+                // console.log(year)
+                var genres = [];
+
+                if (!(data[key].Genre1.length == 0)){
+                  genres.push(data[key].Genre1);
+                }
+                if (!(data[key].Genre2.length == 0)){
+                  genres.push(data[key].Genre2);
+                }
+                if (!(data[key].Genre3.length == 0)){
+                  genres.push(data[key].Genre3);
+                }
+
+                for (let genre of genres){
+                  if (!totDict[genre]){
+                    totDict[genre] = {}
+                  }
+                  var inGenre = totDict[genre]
+
+                  if (!(inGenre[year])){
+                    inGenre[year] = []
+                  }
+                  inGenre[year].push(title);
+                }
+              }
+              console.log(totDict)
+              var chartData = []
+
+              for (var genre in totDict){
+                // order: genre - year - #movies
+                genreData = {}
+                genreData["type"] = "line"
+                genreData["name"] = `${genre}`
+                genreData["showInLegend"] = true;
+                // genreData["markerSize"] = 0;
+
+                dataPoints = []
+                var inGenre = totDict[genre]
+                for (const [year, movies] of Object.entries(inGenre)){
+                  coordinates = {}
+                  coordinates["x"] = `${year}`
+                  coordinates["y"] = `${movies.length}`
+                  dataPoints.push(coordinates)
+                }
+                // console.log(genreData)
+                genreData["dataPoints"] = dataPoints
+                chartData.push(genreData)
+              }
+              console.log(chartData)
+              for (genre of chartData){
+                console.log(genre)
+                console.log(genre["dataPoints"])
+              }
+
+
+
+              window.onload = function() {
+                var chart = new CanvasJS.chart("chartContainer",{
+                  title: {
+                          text: "Prevalance of genres in popular movies"
+                  },
+                  axisX: {
+                          valueFormatString: "Year"
+                  },
+                  axisY2: {
+                          title: "Frequency"
+                  },
+
+                  data: [
+                    for (genre of chartData){
+
+                      {
+
+                      }
+
+                    }
+
+                  }
+                  ]
+                })
+              }
+              // ----------
+          }
+      }
+
+      txtFile.open("GET", fileName);
+      txtFile.send();
+      // <canvas id="canvas" width="750" height="500"></canvas>
+      // chart.render();
+    </script>
+</body>

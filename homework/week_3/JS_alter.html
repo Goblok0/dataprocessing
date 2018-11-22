@@ -1,4 +1,4 @@
-<!-- /**
+/**
  * Made by: Julian Evalle
  *
  * Description: this program takes in a single object JSON file and extracts
@@ -24,7 +24,8 @@
  * mijn stuk code die nu gecomment is.
  * ook ga ik morgen nog aan een begeleider vragen hoe ik de site gedeelte van
  * deze opdracht moet opzetten in GitHub want ik begrijp de manual niet echt.
- */ -->
+ */
+
 
 <head>
   <title>BananaSlamma</title>
@@ -38,8 +39,8 @@
           if (txtFile.readyState === 4 && txtFile.status == 200) {
               const data = JSON.parse(txtFile.responseText);
 
-              // extracts the relevant data from the JSON file
               var totDict = {};
+              // extracts the relevant data from the JSON file
               for (let key of Object.keys(data)){
                 var title = data[key].Title;
 
@@ -67,8 +68,8 @@
                   if (!totDict[genre]){
                     totDict[genre] = {};
                   }
-
                   var inGenre = totDict[genre]
+
                   if (!(inGenre[year])){
                     inGenre[year] = [];
                   }
@@ -95,7 +96,7 @@
                 chartData.push(genreData)
               }
 
-              // creates the canvas
+              // creates the graph
               var canvas = document.getElementById('graph');
               var ctx = canvas.getContext('2d');
 
@@ -108,10 +109,10 @@
               var xPadBig = xPad + (xGraph / 22);
               var yPad = yGraph / 12;
               var yPadBig = yGraph - yPad;
-              // a y-axis calculation used multiple times
               var yCalc = (yGraph - 2 * yPad)/16;
 
               ctx.beginPath();
+
               // creates the y and x axis of the plot
               ctx.moveTo(xPad, 50);
               // y-axis
@@ -121,33 +122,33 @@
 
               //draws the x-label
               ctx.font = '20px georgia';
-              ctx.fillText("year", xGraph * 0.475, yGraph - (yPad * 0.25));
+              ctx.fillText("year", xGraph * 0.5, yGraph - (yPad * 0.25));
               // draws the rotated y-label
               ctx.save();
               ctx.translate(0, 0);
-              ctx.rotate(Math.PI/-2);
-              ctx.textAlign = 'center';
-              ctx.fillText("amount of releases within the genre", -yGraph * 0.5, xGraph * 0.03);
+              ctx.rotate(Math.PI/2);
+              ctx.fillText("frequency", yGraph * 0.4, -xPad * 0.35 );
               ctx.restore();
 
-              // sets x-ticks and vertical background lines
               ctx.font = '15px georgia';
               ctx.strokeStyle = "#D3D3D3";
+
+              // sets x labels and vertical background lines
               for(var i = 0; i < 7; i++){
                 ctx.fillText(i + startYear, xPadBig + (yGraph / 4.5 * i),
                              yGraph * 0.95);
                 let xCoord = xPadBig + (xGraph / 8 * i);
                 ctx.moveTo(xCoord, yPadBig);
                 ctx.lineTo(xCoord, 0 + yPad);
-              };
+              }
 
-              // sets y-ticks and horizontal background lines
+              // sets y labels and horizontal background lines
               for(var i = 1; i < 16; i++){
                 let yCoord = yPadBig - (yCalc * i);
                 ctx.fillText(i, xPad * 0.65, yCoord);
                 ctx.moveTo(xPad, yCoord);
                 ctx.lineTo(xGraph - xPadBig, yCoord);
-              };
+              }
               ctx.stroke();
 
               // draws the title
@@ -159,12 +160,6 @@
 
               var index = 0;
               for (genre of chartData){
-                var lengthCoordinates = genre["dataPoints"].length;
-                // skips over the genre if has less than 7 datapoints
-                // meaning they are likely not relevant for the R.Question
-                if (lengthCoordinates < 7){
-                  continue;
-                };
                 // picks a colour for the current genre line
                 chosenColour = colourPicker(index);
                 ctx.strokeStyle = `${chosenColour}`;
@@ -181,7 +176,7 @@
 
                 // plots the line for the current genre
                 ctx.beginPath();
-
+                var lengthCoordinates = genre["dataPoints"].length;
                 for (var i = 0; i < (lengthCoordinates - 1); i++){
                   // extracts the begin and end coordinates for each
                   // individual line in the plotted line
@@ -190,22 +185,51 @@
                   var xEnd = parseInt(genre["dataPoints"][i+1].x) - startYear;
                   var yEnd = parseInt(genre["dataPoints"][i+1].y);
 
+
+
+                  // Part of the script which should've made it so that when
+                  // there's a year with no release of the current genres
+                  // then a horizontal line will be plotted at y = 0
+                  //
+                  // var xDiff = xEnd - xBegin;
+                  // if (xDiff > 1){
+                  //   // first iteration:
+                  //   //  keep xyBegin,
+                  //   //  yEnd = yPadBig, xEnd = xBegin + 1
+                  //   // second iteration:
+                  //   // yBegin = yPadBig, xBegin = xBegin + 1
+                  //   // yEnd = yPadBig , xEnd = xBegin + 2
+                  //   yEnd = yPadBig;
+                  //   var xEnd = xBegin + 1;
+                  //   ctx.moveTo(xPadBig + (xGraph / 8 * (xBegin)),
+                  //             yPadBig - ((yCalc * yBegin)))
+                  //   ctx.lineTo(xPadBig + (xGraph / 8 * xEnd), yEnd)
+                  //   for (let j = 1; j < xDiff; j++){
+                  //     ctx.moveTo(xPadBig + (xGraph / 8 * xBegin), yEnd)
+                  //     ctx.lineTo(xPadBig + (xGraph / 8 * xEnd), yEnd)
+                  //     xBegin += 1;
+                  //     xEnd += 1
+                  //
+                  //   }
+                  //
+                  //   var xEnd = parseInt(genre["dataPoints"][i+1].x) - startYear;
+                  //   var yEnd = parseInt(genre["dataPoints"][i+1].y);
+                  //   }
+
                   // draws individual line
                   ctx.moveTo(xPadBig + (xGraph / 8 * xBegin),
                             yPadBig - ((yCalc * yBegin)));
                   ctx.lineTo(xPadBig + (xGraph / 8 * xEnd),
                             yPadBig - ((yCalc * yEnd)));
                   ctx.stroke();
-                };
+                }
                 index += 1;
-              };
+              }
               ctx.strokeStyle = "#000000";
-              // creates the border around the legend,
-              // uses index to scale with legend length
               ctx.strokeRect(xGraph * 0.89, yGraph * 0.03 * index + yGraph * 0.1,
                             (xGraph * 0.1), -(yGraph * 0.031 * index));
-            };
-          };
+            }
+          }
       txtFile.open("GET", fileName);
       txtFile.send();
 

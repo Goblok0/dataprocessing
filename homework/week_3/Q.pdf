@@ -14,4 +14,4 @@
     a query selector is a function which can find the first element in the DOM
     using the given selector or a group of selectors.
 
-    file.querySelector(".id")
+    file.querySelector(".id") // gets the first element in the file with class = "id"

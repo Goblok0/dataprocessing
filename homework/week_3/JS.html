@@ -7,34 +7,42 @@
  *
  *
  * Notitie naar nakijker:
- * dit is de JS file die ik wil inleveren. de JS_alter file bezit een stuk code
+ * ---Ik wil graag mijn WILDCARD gebruiken---
+ * Dit is de JS file die ik wil inleveren. de JS_alter file bezit een stuk code
  * die ik niet af heb kunnen maken, in de header comment van JS_alter beschrijf
- * ik het probleem, als u tijd heeft om ernaar te kijken.
+ * ik het probleem, als u tijd heeft om ernaar te kijken en erachter kan komen
+ * wat het probleem is dan zou ik dat graag willen weten.
 
  */ -->
 
 <head>
-  <title>BananaSlamma</title>
+  <title>DP Movies</title>
+  Julian Evalle, 11286369
+  Opdr: JS
+  #dataset: https://data.world/saipranav/top-rated-english-movies-of-this-decade-from-imdb
 </head>
 <body>
     <script>
       // loads the data and plots into a line-graph
-      var fileName = "data2.json";
+      var fileName = "data.json";
       var txtFile = new XMLHttpRequest();
       txtFile.onreadystatechange = function() {
           if (txtFile.readyState === 4 && txtFile.status == 200) {
               const data = JSON.parse(txtFile.responseText);
 
               // extracts the relevant data from the JSON file
+              // structure = totDict{genre:[movietitles]}
               var totDict = {};
               for (let key of Object.keys(data)){
                 var title = data[key].Title;
 
                 // seperates the title and year
                 splitted = title.split("(");
-                console.log(splitted)
                 splitLength = splitted.length;
-                if (splitLength = 2){
+
+                // check if a movie has a subtitle between
+                // parantheses(e.g. row 12 in IMDB.csv)
+                if (splitLength == 2){
                   var title = splitted[0];
                   var year = splitted[1].replace(")","");
                 }
@@ -42,7 +50,6 @@
                   var title = splitted[0];
                   var year = splitted[splitLength-1].replace(")","");
                 };
-                console.log(year);
 
                 var genres = [];
                 // checks if the genre column contains any data and
@@ -75,6 +82,7 @@
               };
 
               // reorganizes the extracted data to a structure easier to plot
+              // structure = chartData[genreData{name: x: y:}]
               var chartData = [];
               for (var genre in totDict){
                 genreData = {};
@@ -100,6 +108,8 @@
               var startYear = 2010;
               var xGraph = canvas.width;
               var yGraph = canvas.height;
+              var yTicks = 16;
+              var xTicks = 7;
 
               // assigns dynamic padding variables
               var xPad = xGraph / (14 + 2 / 3);
@@ -107,11 +117,11 @@
               var yPad = yGraph / 12;
               var yPadBig = yGraph - yPad;
               // a y-axis calculation used multiple times
-              var yCalc = (yGraph - 2 * yPad)/16;
+              var yCalc = (yGraph - 2 * yPad)/yTicks;
 
               ctx.beginPath();
               // creates the y and x axis of the plot
-              ctx.moveTo(xPad, 50);
+              ctx.moveTo(xPad, yPad);
               // y-axis
               ctx.lineTo(xPad, yPadBig);
               // x-axis
@@ -123,7 +133,7 @@
               // draws the rotated y-label
               ctx.save();
               ctx.translate(0, 0);
-              ctx.rotate(Math.PI/-2);
+              ctx.rotate(Math.PI / -2);
               ctx.textAlign = 'center';
               ctx.fillText("amount of releases within the genre", -yGraph * 0.5, xGraph * 0.03);
               ctx.restore();
@@ -131,7 +141,7 @@
               // sets x-ticks and vertical background lines
               ctx.font = '15px georgia';
               ctx.strokeStyle = "#D3D3D3";
-              for(var i = 0; i < 7; i++){
+              for(var i = 0; i < xTicks; i++){
                 ctx.fillText(i + startYear, xPadBig + (yGraph / 4.5 * i),
                              yGraph * 0.95);
                 let xCoord = xPadBig + (xGraph / 8 * i);
@@ -140,7 +150,7 @@
               };
 
               // sets y-ticks and horizontal background lines
-              for(var i = 1; i < 16; i++){
+              for(var i = 1; i < yTicks; i++){
                 let yCoord = yPadBig - (yCalc * i);
                 ctx.fillText(i, xPad * 0.65, yCoord);
                 ctx.moveTo(xPad, yCoord);
@@ -158,10 +168,10 @@
 
               var index = 0;
               for (genre of chartData){
-                var lengthCoordinates = genre["dataPoints"].length;
                 // skips over the genre if has less than 7 datapoints
-                // meaning they are likely not relevant for the R.Question
-                if (lengthCoordinates < 7){
+                // meaning they are likely not relevant for the Res.Question
+                var lengthCoordinates = genre["dataPoints"].length;
+                if (lengthCoordinates < xTicks){
                   continue;
                 };
                 // picks a colour for the current genre line

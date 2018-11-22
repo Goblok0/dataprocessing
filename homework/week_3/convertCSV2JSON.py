@@ -4,7 +4,6 @@
 # row being assigned to a row dictionary with the header as key per column
 # in that row
 
-#dataset: https://data.world/saipranav/top-rated-english-movies-of-this-decade-from-imdb
 
 import csv
 import json

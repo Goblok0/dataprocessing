@@ -5,25 +5,12 @@
  * specific data and plots it in a line chart. The Canvas can be resized and
  * the plot will resize accordingly.
  *
- * Problem: due to a late oversight, the program plots from one point
- * to the next given datapoint, but if a year misses it will ignore that fact.
- * due to this some plotted genres seem to claim that they had a release in some
- * years even though they did not. A small code was in process but, due
- * to confusing errors it has not yet been fixed.
  *
  * Notitie naar nakijker:
- * Ik zou graag willen zeggen dat met data die voor iedere gegeven jaar een waarde
- * heeft geen problemen veroorzaakt en dat mijn code in die context werkt.
- * met de huidige data kan het op zijn minst de vraag van
- * "welke genre in de highest rated movie list krijgt de meeste releases" beantwoorden
- * Ik weet nog niet of ik een WILDCARD zou willen gebruiken.
- * Als het mogelijk is zou ik mijn code nog de dag na de deadline willen
- * bespreken met een begeleider en als die zegt dat mijn code onvoldoende is
- * dan zou ik mijn WILDCARD willen gebruiken.
- * Als het blijkt dat mijn code voldoende zou ik graag willen weten wat exact mis is met
- * mijn stuk code die nu gecomment is.
- * ook ga ik morgen nog aan een begeleider vragen hoe ik de site gedeelte van
- * deze opdracht moet opzetten in GitHub want ik begrijp de manual niet echt.
+ * dit is de JS file die ik wil inleveren. de JS_alter file bezit een stuk code
+ * die ik niet af heb kunnen maken, in de header comment van JS_alter beschrijf
+ * ik het probleem, als u tijd heeft om ernaar te kijken.
+
  */ -->
 
 <head>
@@ -32,7 +19,7 @@
 <body>
     <script>
       // loads the data and plots into a line-graph
-      var fileName = "data.json";
+      var fileName = "data2.json";
       var txtFile = new XMLHttpRequest();
       txtFile.onreadystatechange = function() {
           if (txtFile.readyState === 4 && txtFile.status == 200) {
@@ -45,36 +32,47 @@
 
                 // seperates the title and year
                 splitted = title.split("(");
-                var title = splitted[0];
-                var year = splitted[1].replace(")","");
+                console.log(splitted)
+                splitLength = splitted.length;
+                if (splitLength = 2){
+                  var title = splitted[0];
+                  var year = splitted[1].replace(")","");
+                }
+                else{
+                  var title = splitted[0];
+                  var year = splitted[splitLength-1].replace(")","");
+                };
+                console.log(year);
 
                 var genres = [];
                 // checks if the genre column contains any data and
                 // assigns it to the genres list
                 if (!(data[key].Genre1.length == 0)){
                   genres.push(data[key].Genre1);
-                }
+                };
                 if (!(data[key].Genre2.length == 0)){
                   genres.push(data[key].Genre2);
-                }
+                };
                 if (!(data[key].Genre3.length == 0)){
                   genres.push(data[key].Genre3);
-                }
+                };
 
                 // create a dict for each newly found genre and places the
                 // movie title in each genre dict it belongs to
                 for (let genre of genres){
+                  // check if the genre has been seen in previous movies
                   if (!totDict[genre]){
                     totDict[genre] = {};
-                  }
-
+                  };
+                  // check if the year in the genre has been seen in previous
+                  // movies
                   var inGenre = totDict[genre]
                   if (!(inGenre[year])){
                     inGenre[year] = [];
-                  }
+                  };
                   inGenre[year].push(title);
-                }
-              }
+                };
+              };
 
               // reorganizes the extracted data to a structure easier to plot
               var chartData = [];
@@ -89,11 +87,11 @@
                   coordinates = {};
                   coordinates["x"] = `${year}`;
                   coordinates["y"] = `${movies.length}`;
-                  dataPoints.push(coordinates)
-                }
+                  dataPoints.push(coordinates);
+                };
                 genreData["dataPoints"] = dataPoints;
-                chartData.push(genreData)
-              }
+                chartData.push(genreData);
+              };
 
               // creates the canvas
               var canvas = document.getElementById('graph');
@@ -149,6 +147,7 @@
                 ctx.lineTo(xGraph - xPadBig, yCoord);
               };
               ctx.stroke();
+              ctx.closePath();
 
               // draws the title
               ctx.font = '25px georgia';
@@ -179,9 +178,7 @@
                 ctx.fillText(genre.name, xGraph * 0.92,
                              yGraph * 0.03 * index + yGraph * 0.105);
 
-                // plots the line for the current genre
-                ctx.beginPath();
-
+                // plots the lines for the current genre
                 for (var i = 0; i < (lengthCoordinates - 1); i++){
                   // extracts the begin and end coordinates for each
                   // individual line in the plotted line
@@ -198,12 +195,14 @@
                   ctx.stroke();
                 };
                 index += 1;
+                ctx.closePath();
               };
               ctx.strokeStyle = "#000000";
               // creates the border around the legend,
               // uses index to scale with legend length
               ctx.strokeRect(xGraph * 0.89, yGraph * 0.03 * index + yGraph * 0.1,
                             (xGraph * 0.1), -(yGraph * 0.031 * index));
+
             };
           };
       txtFile.open("GET", fileName);
@@ -214,7 +213,7 @@
         var colourArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
                           '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
                           '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
-                          '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC']
+                          '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC'];
         picker = colourArray[x];
         return picker;
       }

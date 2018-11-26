@@ -3,6 +3,15 @@
   <head>
     <script type="text/javascript" src="d3/d3.js"></script>
     <style type="text/css">
+        div.bar {
+            display: inline-block;
+            width: 5px;
+            height: 5px;   /* We'll override this later */
+            background-color: teal;
+        }
+        p.meh {
+            color: blue;
+        }
     </style>
   </head>
   <body>
@@ -10,24 +19,164 @@
       d3.select("head")
         .append("title")
         .text("pahn");
-      d3.select("body")
-        .append("p")
-        .text("bar title");
-      d3.select("body")
-        .append("p")
-        .text("name: Julian Evalle stud_id: 11286369");
+      // d3.select("body")
+      //   .append("p")
+      //   .text("bar title")
+      //   .attr("class", "meh");
+      // d3.select("body")
+      //   .append("p")
+      //   .text("name: Julian Evalle stud_id: 11286369")
+      //   .attr("class", "meh");
       d3.json("data.json").then(function(data) {
-        console.log(data);
-        var totDict = {};
+
+        var totDict = {}
+        // ktoe = Kilotonne of Oil Equivalent
+        totDict["KTOE"] = {};
+        // primary energy
+        totDict["PC_PRYENRGSUPPLY"] = {};
+        // dict{year{country[]}}
         for (let key of Object.keys(data)){
+          row = data[key];
+          // do not use location
+          country = row["LOCATION"];
+          year = parseInt(row["TIME"]);
+          value = parseInt(row["Value"]);
+          if (!(value)){
+            continue
+          }
+          measure = row["MEASURE"]
+          dict = totDict[measure]
 
+          if (!(dict[year])){
+              dict[year] = {}
+          };
+          yearDict = dict[year]
+          yearDict[country] = value;
+
+        };
+        var ktoeList = []
+        // console.log(Object.keys(totDict["KTOE"]))
+        for (let key of Object.keys(totDict["KTOE"])){
+
+          var yearAVG = 0
+          countries = totDict["KTOE"][key]
+          for (let countryKey of Object.keys(countries)){
+              yearAVG += countries[countryKey]
+          }
+          division = Object.keys(countries).length
+          yearAVG = yearAVG / division
+          ktoeList.push(yearAVG)
+
+          // ktoeList.push(ktoeDict[key])
         }
-      });
 
+        var w = 1000;
+        var h = 500;
+
+        var dataLen = ktoeList.length
+        var padding = w/100
+        var dScaler = 75
+
+        var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+        d3.select("body").selectAll("div")
+          .data(ktoeList)  // <-- The answer is here!
+          .enter()
+          .append("div")
+          .attr("class", "bar")
+          .style("height", function(d) {
+              var barHeight = d/100;
+              return barHeight + "px";
+          });
+
+        // var bars = svg.selectAll("rect")
+        //               .data(ktoeList)
+        //               .enter()
+        //               .append("rect");
+        //
+        // bars.attr("cx", function(d,i){
+        //           return(i * 5) + 25
+        //      })
+        //      .attr("cy", h/2)
+             //Width and height
+
+        var scale = d3.scaleLinear();
+        var max = d3.max(ktoeList, function(d){
+                                    return d;
+                                  });
+
+        var xScale = scale
+                    .domain([0, max])
+                    .range([0, w]);
+        // var yScale = scale
+        //             .domain([0, max])
+        //             .range([0, h]);
+        //
+        var rects = svg.selectAll("rect")
+               			   .data(ktoeList)
+               			   .enter()
+               			   .append("rect");
+
+
+
+         rects.attr("x", function(d, i) {
+       						return (i * (w / (dataLen) - padding ) + 25);
+       					  })
+              .attr("y", function(d){
+                  return h - d/dScaler;
+                  })
+              // .attr("x", function(d){
+              //           return xScale(d)
+              //           })
+             // .attr("y", function(d){
+             //            return yScale(d)
+             //            })
+
+   				   .attr("width", w / (dataLen) - padding)
+             .attr("height", function(d){
+                d = d/dScaler
+                return d;
+              })
+             // color function provided by http://alignedleft.com/tutorials/d3/making-a-bar-chart
+             .attr("fill", function(d) {
+               return "rgb(0,0," + (d / dScaler * 0.6) + ")"
+             });
+
+        var xAxis = d3.svg.axis()
+                          .scale(xScale)
+                          .orient("bottom");
+
+
+
+        // placed at end of script
+        svg.append("g")
+           .call(xAxis)
+       });
+      // })
+
+
+
+
+
+
+      // const yearAverage = function(x){
+      //   for (let key of Object.keys(totDict["KTOE"])){
+      //
+      //     var yearAVG = 0
+      //     countries = totDict["KTOE"][key]
+      //     for (let countryKey of Object.keys(countries)){
+      //         yearAVG += countries[countryKey]
+      //     }
+      //     division = Object.keys(countries).length
+      //     yearAVG = yearAVG / division
+      //     ktoeList.push(yearAVG)
+      //
+      //     // ktoeList.push(ktoeDict[key])
+      //   }
+      // }
     </script>
-    <svg width="50" height="50">
-      <circle cx="25" cy="25" r="22" fill="blue" stroke="gray" stroke-width="2"/>
-    </svg>
-    <!-- This is where your bar chart will go -->
   </body>
 </html>

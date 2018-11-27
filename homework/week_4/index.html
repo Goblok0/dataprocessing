@@ -1,204 +1,274 @@
+<!--
+Created By: Julian Evalle
+Opdr: D3 bar chart
+
+Description: This programme reads in a JSON file and extracts specific data,
+subsequently plots the data as a bar chart
+
+Note: op rij 177-178 & 159-162 wilde ik ervoor zorgen dat idere balk lichter
+of donkerder zou worden afhankelijk van hoe hoog de balk was. dit lukte mij
+voordat ik gebruik maakte van scaling. De colScale functie werkt, maar de enige
+kleuren die weren gegeven was alles zwart of alles blauw. Als u kunt zien wat
+Het probleem is dan zou ik dat graag willen weten.
+
+Tooltip credit
+credit to Alan Dunning for everything that has been done with the V5-usable tooltip:
+link to used site: https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7
+
+Changing Bar-Colour credit:
+credit to Phil Pedruco for the bar-colour change code
+link to referenced site: http://bl.ocks.org/phil-pedruco/9032348
+ -->
+
 <!DOCTYPE html>
 <html>
   <head>
     <script type="text/javascript" src="d3/d3.js"></script>
     <style type="text/css">
-        div.bar {
-            display: inline-block;
-            width: 5px;
-            height: 5px;   /* We'll override this later */
-            background-color: teal;
-        }
-        p.meh {
-            color: blue;
-        }
+      .toolTip {
+        position: absolute;
+        display: none;
+        min-width: 80px;
+        height: auto;
+        background: none repeat scroll 0 0 #ffffff;
+        border: 1px solid #6F257F;
+        padding: 14px;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <script type="text/javascript">
+
+      // choose between "KTOE" or "PC_PRYENRGSUPPLY" for the respective graph
+      var choice = "KTOE"
+
       d3.select("head")
         .append("title")
         .text("pahn");
-
+      // reads in the JSON data
       d3.json("data.json").then(function(data) {
+          var totDict = {};
+          // creates two seperate dicts for each type of value
+          // ktoe = Kilotonne of Oil Equivalent
+          totDict["KTOE"] = {};
+          // primary energy
+          totDict["PC_PRYENRGSUPPLY"] = {};
 
-        var totDict = {}
-        // ktoe = Kilotonne of Oil Equivalent
-        totDict["KTOE"] = {};
-        // primary energy
-        totDict["PC_PRYENRGSUPPLY"] = {};
-        // dict{year{country[]}}
-        for (let key of Object.keys(data)){
-            row = data[key];
-            // do not use location
-            country = row["LOCATION"];
-            year = parseInt(row["TIME"]);
-            value = parseInt(row["Value"]);
-            if (!(value)){
-                continue
-            }
-            measure = row["MEASURE"]
-            dict = totDict[measure]
+          // structure: dict{year{country[]}}
+          for (let key of Object.keys(data)){
+              row = data[key];
+              value = parseInt(row["Value"]);
+              // check if the current country row contains a value
+              if (!(value)){
+                  continue;
+              }
+              // do not use location as a variable name, is a JS-variable
+              country = row["LOCATION"];
+              year = parseInt(row["TIME"]);
+              measure = row["MEASURE"];
+              dict = totDict[measure];
+              // check if the found year has been seen before
+              if (!(dict[year])){
+                  dict[year] = {};
+              };
+              // adds the found value to the year with country as key
+              yearDict = dict[year];
+              yearDict[country] = value;
 
-            if (!(dict[year])){
-                dict[year] = {}
-            };
-            yearDict = dict[year]
-            yearDict[country] = value;
+          };
+          // creates a list with [year, average] pairs
+          var ktoeList = [];
+          // goes through all the years found in totDict
+          for (let key of Object.keys(totDict[`${choice}`])){
+            var yearAVG = 0;
+            countries = totDict[`${choice}`][key];
+            // goes through all the countries with a value in that year and
+            // returns the average
+            yearAVG = average(countries);
+            ktoeList.push([key,yearAVG]);
+          };
 
-        };
-        var ktoeList = []
-        // console.log(Object.keys(totDict["KTOE"]))
-        for (let key of Object.keys(totDict["KTOE"])){
-          // console.log(key)
-          var yearAVG = 0
-          countries = totDict["KTOE"][key]
-          for (let countryKey of Object.keys(countries)){
-              yearAVG += countries[countryKey]
-          }
-          division = Object.keys(countries).length
-          yearAVG = yearAVG / division
-          // console.log([key, yearAVG])
-          ktoeList.push([key,yearAVG])
+          // defines width and height of the SVG
+          var width = 500;
+          var height = 500;
 
-        }
-        console.log(ktoeList)
+          // creates the padding values
+          pad = {
+            top: height * 0.05,
+            bottom: height * 0.1,
+            left: width* 0.1,
+            right: width * 0.01
+          };
 
-        var width = 500;
-        var height = 500;
+          // defines the space within the SVG in which the chart will be created
+          var wChart = width - pad.left - pad.right;
+          var hChart = height - pad.bottom - pad.top;
 
-        pad = {
-          top: height * 0.05,
-          bottom: height * 0.1,
-          left: width* 0.1,
-          right: width * 0.01
-        };
+          var dataLen = ktoeList.length;
 
-        // the padded width and height variables
-        var w = width - pad.left - pad.right;
-        var h = height - pad.bottom - pad.top;
+          // makes the SVG canvas
+          var svg = d3.select("body")
+                      .append("svg")
+                      .attr("width", width)
+                      .attr("height", height);
 
-        var dataLen = ktoeList.length
+          // creates the toolTip element
+          var tooltip = d3.select("body")
+                          .append("div")
+                          .attr("class", "toolTip");
 
-        var svg = d3.select("body")
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height);
+          // make background rectangle the size of the SVG
+          svg.append("rect")
+             .attr("width", "100%")
+             .attr("height", "100%")
+             .attr("fill", "grey")
+             .attr("opacity", 0.1);
 
-        // make background rectangle the size of the SVG
-        svg.append("rect")
-           .attr("width", "100%")
-           .attr("height", "100%")
-           .attr("fill", "grey")
-           .attr("opacity", 0.1);
+          // adds the data in the ktoeList to an element in the HTML
+          var rects = svg.selectAll("rect")
+                         .data(ktoeList)
+                         .enter()
+                         .append("rect");
 
+          // isolates the lowest data value from the data
+          var min = d3.min(ktoeList, function(d){
+                                     return d[1];
+                                   });
+          // isolates the highest data value from the data
+          var max = d3.max(ktoeList, function(d){
+                                      return d[1];
+                                    });
+          // isolates the starting year from the data
+          var minYear = d3.min(ktoeList, function(d){
+                                      return d[0];
+                                    });
+          // isolates the last year from the data
+          var maxYear = d3.max(ktoeList, function(d){
+                                      return d[0];
+                                    });
 
+          // rescales the x-values to the size of the graph
+          var xScale = d3.scaleLinear()
+                      .domain([minYear, maxYear])
+                      .range([pad.left, wChart - pad.right]);
+          // rescales the y-values to the size of the graph
+          var yScale = d3.scaleLinear()
+                      .domain([0, max])
+                      .range([hChart , pad.top]);
+          // gives the bar a different shade depending on the value
+          // var colScale = d3.scaleLinear()
+          //                  .domain([0,max])
+          //                  .range([0,255])
 
-
-        var rects = svg.selectAll("rect")
-                       .data(ktoeList)
-                       .enter()
-                       .append("rect");
-
-        var min = d3.min(ktoeList, function(d){
-                                   return d[1];
-                                 });
-        var max = d3.max(ktoeList, function(d){
-                                    return d[1];
-                                  });
-        var minYear = d3.min(ktoeList, function(d){
-                                    return d[0];
-                                  });
-        var maxYear = d3.max(ktoeList, function(d){
-                                    return d[0];
-                                  });
-
-        var xScale = d3.scaleLinear()
-                    .domain([minYear, maxYear])
-                    .range([pad.left, w - pad.right]);
-        var yScale = d3.scaleLinear()
-                    .domain([0, max])
-                    .range([h , pad.top]);
-        var colScale = d3.scaleLinear()
-                         .domain([0,max])
-                         .range([0,255])
-
-        rects.attr("x", function(d){
-                       return xScale(d[0]) + xScale(minYear) * 0.85;
-                       })
-             .attr("y", function(d){
-                       return yScale(d[1]) + pad.top;
-                       })
-             .attr("width", (w - pad.left - pad.right) / (dataLen))
-             .attr("opacity", 0.1)
-             .attr("height", function(d){
-                            return h - yScale(d[1]);
+          // defines the attributes of the rectangles
+          rects.attr("x", function(d){
+                          return xScale(d[0]) + xScale(minYear) * 0.85;
                           })
-            .attr("fill", function(d) {
-              // colScale works, but colour is only black or blue
-              return "rgb(0,0," + (colScale(d)) + ")"
-            });
+               .attr("y", function(d){
+                          return yScale(d[1]) + pad.top;
+                          })
+               .attr("width", (wChart - pad.left - pad.right) / (dataLen))
+               .attr("opacity", 0.1)
+               .attr("height", function(d){
+                               return hChart - yScale(d[1]);
+                               })
+               .attr("fill", function(d) {
+                  // colScale works, but colour is only black or blue
+                  // return "rgb(0,0," + (colScale(d)) + ")"
+                              return "blue";
+                              })
+                // Allows for the toolTip. credit to Alan Dunning
+               .on("mousemove", function(d){
+                                 tooltip.style("left", d3.event.pageX - 50 + "px")
+                                        .style("top", d3.event.pageY - 70 + "px")
+                                        .style("display", "inline-block")
+                                        .html(d[1] +", year: "+ d[0] );
+                                 })
+            	 .on("mouseout", function(d){
+                                tooltip.style("display", "none");
+                                })
+                // Allows for the bar-color changing. credit to phil-pedruco
+               .on("mouseover", function() {
+                                d3.select(this)
+                                  .attr("fill", "red");
+                                })
+               .on("mouseout", function(d, i) {
+                               d3.select(this)
+                                 .attr("fill", "blue");
+                               });
+          // assigns variables for their respective axis
+          var xAxis = d3.axisBottom()
+                        .scale(xScale)
+                        .tickFormat(d3.format("d"));
+          var yAxis = d3.axisLeft()
+                        .scale(yScale);
+          // creates the X-axis
+          svg.append("g")
+             .attr("transform", "translate("+ (xScale(minYear)) + ","
+                                            + (height * 0.92) + ")")
+             .call(xAxis);
+          // creates the Y-axis
+          svg.append("g")
+             .attr("transform", "translate("+ (pad.left * 1.5) + ","
+                                            + (yScale(max)) + ")")
+             .call(yAxis);
 
-
-
-        var xAxis = d3.axisBottom()
-                      .scale(xScale)
-                      .tickFormat(d3.format("d"));
-        var yAxis = d3.axisLeft()
-                      .scale(yScale);
-        // x-axis
-        svg.append("g")
-           .attr("transform", "translate("+ (xScale(minYear)) + "," + (height * 0.92) + ")")
-           .call(xAxis);
-
-        // y-axis
-        svg.append("g")
-           .attr("transform", "translate("+ (pad.left * 1.5) + "," + (yScale(max)) + ")")
-           .call(yAxis);
-
-       svg.append("text")
-          .attr("transform", "translate(" + (width * 0.575) + "," + (height * 0.05) + ")")
-          .style("text-anchor", "middle")
-          .text("The average of Kilotonne of Oil Equivalent in a worldcountry")
-
-        svg.append("text")
-           .attr("transform", "translate(" + xScale(1995) + "," + (height * 0.99) + ")")
-           .style("text-anchor", "middle")
-           .text("Years")
-
-        svg.append("text")
-           .attr("transform", "rotate(-90)")
-           .attr("y", width * 0.025)
-           .attr("x", 0 - (height / 2))
-           .attr("dy", "1em")
-           .style("text-anchor", "middle")
-           .text("Average KTOE in a country(KTOE)");
-
-
-
-
+          if (choice == "KTOE"){
+            // creates the title
+            svg.append("text")
+               .attr("transform", "translate(" + (width * 0.575) + ","
+                                               + (height * 0.05) + ")")
+               .style("text-anchor", "middle")
+               .text("The average of Kilotonne of Oil Equivalent in a worldcountry");
+            // creates the X-axis label
+            svg.append("text")
+               .attr("transform", "translate(" + xScale(1995) + ","
+                                               + (height * 0.99) + ")")
+               .style("text-anchor", "middle")
+               .text("Years");
+            // creates the Y-axis label
+            svg.append("text")
+               .attr("transform", "rotate(-90)")
+               .attr("y", width * 0.025)
+               .attr("x", 0 - (height / 2))
+               .style("text-anchor", "middle")
+               .text("Average KTOE in a country(KTOE)");
+          }
+          else{
+            // creates the title
+            svg.append("text")
+               .attr("transform", "translate(" + (width * 0.575) + ","
+                                               + (height * 0.05) + ")")
+               .style("text-anchor", "middle")
+               .text("The average % of the Primary Energy" +
+                      "supply in a country/year");
+            // creates the X-axis label
+            svg.append("text")
+               .attr("transform", "translate(" + xScale(1995) + ","
+                                               + (height * 0.99) + ")")
+               .style("text-anchor", "middle")
+               .text("Years");
+            // creates the Y-axis label
+            svg.append("text")
+               .attr("transform", "rotate(-90)")
+               .attr("y", width * 0.025)
+               .attr("x", 0 - (height / 2))
+               .style("text-anchor", "middle")
+               .text("Average % of PES in a country");
+          };
        });
-
-
-
-
-
-
-      // const yearAverage = function(x){
-      //   for (let key of Object.keys(totDict["KTOE"])){
-      //
-      //     var yearAVG = 0
-      //     countries = totDict["KTOE"][key]
-      //     for (let countryKey of Object.keys(countries)){
-      //         yearAVG += countries[countryKey]
-      //     }
-      //     division = Object.keys(countries).length
-      //     yearAVG = yearAVG / division
-      //     ktoeList.push(yearAVG)
-      //
-      //     // ktoeList.push(ktoeDict[key])
-      //   }
-      // }
+       // goes through the object and returns the average of the num values
+       const average = function(countries){
+           let yearAVG = 0;
+           let keys = Object.keys(countries);
+           for (let countryKey of keys){
+               yearAVG += countries[countryKey];
+           }
+           division = keys.length;
+           yearAVG = Math.round((yearAVG / division));
+           return yearAVG;
+       }
     </script>
   </body>
 </html>

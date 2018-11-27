@@ -68,15 +68,14 @@
         var height = 500;
 
         pad = {
-          top: height * 0.05,
-          bottom: height * 0.1,
-          left: width* 0.1,
-          right: width * 0.01
+          top: height/10,
+          bottom: height/17,
+          left: width/10,
+          right: width/25
         };
 
-        // the padded width and height variables
         var w = width - pad.left - pad.right;
-        var h = height - pad.bottom - pad.top;
+        var h = height - pad.top - pad.bottom;
 
         var dataLen = ktoeList.length
 
@@ -84,17 +83,6 @@
                     .append("svg")
                     .attr("width", width)
                     .attr("height", height);
-
-        // make background rectangle the size of the SVG
-        svg.append("rect")
-           .attr("width", "100%")
-           .attr("height", "100%")
-           .attr("fill", "grey")
-           .attr("opacity", 0.1);
-
-
-
-
         var rects = svg.selectAll("rect")
                        .data(ktoeList)
                        .enter()
@@ -115,22 +103,21 @@
 
         var xScale = d3.scaleLinear()
                     .domain([minYear, maxYear])
-                    .range([pad.left, w - pad.right]);
+                    .range([0, w]);
         var yScale = d3.scaleLinear()
                     .domain([0, max])
-                    .range([h , pad.top]);
+                    .range([h, 0]);
         var colScale = d3.scaleLinear()
                          .domain([0,max])
                          .range([0,255])
 
         rects.attr("x", function(d){
-                       return xScale(d[0]) + xScale(minYear) * 0.85;
+                       return xScale(d[0]) + width * 0.05;
                        })
              .attr("y", function(d){
-                       return yScale(d[1]) + pad.top;
+                       return yScale(d[1]);
                        })
-             .attr("width", (w - pad.left - pad.right) / (dataLen))
-             .attr("opacity", 0.1)
+             .attr("width", w / (dataLen))
              .attr("height", function(d){
                             return h - yScale(d[1]);
                           })
@@ -140,41 +127,14 @@
             });
 
 
+        // x-axis
+        var x_axis = d3.axisBottom()
+                       .scale(xScale);
 
-        var xAxis = d3.axisBottom()
-                      .scale(xScale)
-                      .tickFormat(d3.format("d"));
-        var yAxis = d3.axisLeft()
-                      .scale(yScale);
+
         // x-axis
         svg.append("g")
-           .attr("transform", "translate("+ (xScale(minYear)) + "," + (height * 0.92) + ")")
-           .call(xAxis);
-
-        // y-axis
-        svg.append("g")
-           .attr("transform", "translate("+ (pad.left * 1.5) + "," + (yScale(max)) + ")")
-           .call(yAxis);
-
-       svg.append("text")
-          .attr("transform", "translate(" + (width * 0.575) + "," + (height * 0.05) + ")")
-          .style("text-anchor", "middle")
-          .text("The average of Kilotonne of Oil Equivalent in a worldcountry")
-
-        svg.append("text")
-           .attr("transform", "translate(" + xScale(1995) + "," + (height * 0.99) + ")")
-           .style("text-anchor", "middle")
-           .text("Years")
-
-        svg.append("text")
-           .attr("transform", "rotate(-90)")
-           .attr("y", width * 0.025)
-           .attr("x", 0 - (height / 2))
-           .attr("dy", "1em")
-           .style("text-anchor", "middle")
-           .text("Average KTOE in a country(KTOE)");
-
-
+           .call(x_axis);
 
 
        });

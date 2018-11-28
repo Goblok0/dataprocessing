@@ -46,6 +46,10 @@ link to referenced site: http://bl.ocks.org/phil-pedruco/9032348
       d3.select("head")
         .append("title")
         .text("pahn");
+
+      d3.select("body")
+        .append("p")
+        .text("Julian Evalle, 11286369, opdr d3 Bar Chart");
       // reads in the JSON data
       d3.json("data.json").then(function(data) {
           var totDict = {};

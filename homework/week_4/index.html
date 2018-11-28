@@ -50,6 +50,14 @@ link to referenced site: http://bl.ocks.org/phil-pedruco/9032348
       d3.select("body")
         .append("p")
         .text("Julian Evalle, 11286369, opdr d3 Bar Chart");
+
+      d3.select("body")
+        .append("p")
+        .text("Depending on the choice in the programme the graph represents" +
+               "The average Kilotonne of Oil Equivalent of country" +
+               "or the average Primary Energy Supply of a country" +
+               "both averages are taking in all other countries in the world");
+
       // reads in the JSON data
       d3.json("data.json").then(function(data) {
           var totDict = {};

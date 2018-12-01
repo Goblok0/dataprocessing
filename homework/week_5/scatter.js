@@ -20,15 +20,15 @@ const process = function(data){
   // console.log(data)
   // per country[0-8: 2007-2015]
 
-  // women in science
+  // women researchers as a percentage of total researchers
   // countries: FRA: France, DEU: Germany, KOR: Korea, NLD: Netherlands, PRT: Portugal, GBR: United Kingdom
-  wis = data[0]
-  wisSeries = wis["dataSets"]["0"]["series"]
-  wisCountryNames = wis["structure"]["dimensions"]["series"]["1"]["values"]
+  var wis = data[0]
+  var wisSeries = wis["dataSets"]["0"]["series"]
+  var wisCountryNames = wis["structure"]["dimensions"]["series"]["1"]["values"]
   console.log(wis)
   // console.log(wisCountryNames)
 
-  wisCountries = {}
+  var wisCountries = {}
   for (let index in Object.keys(wisSeries)){
     var countryName = `${wisCountryNames[index]["id"]}`
     var countryData = wisSeries[`0:${index}`]["observations"]
@@ -36,15 +36,15 @@ const process = function(data){
   }
   console.log(wisCountries)
 
-  // frequency
+  // Consumer Confidence
   // countries FRA: France, NLD: Netherlands, PRT:Portugal, DEU: Germany, GBR: United Kingdom, KOR: Korea
-  cConf = data[1]
-  cConfSeries = cConf["dataSets"]["0"]["series"]
-  cConfCountryNames = cConf["structure"]["dimensions"]["series"]["0"]["values"]
+  var cConf = data[1]
+  var cConfSeries = cConf["dataSets"]["0"]["series"]
+  var cConfCountryNames = cConf["structure"]["dimensions"]["series"]["0"]["values"]
   // console.log(wisSeries)
   // console.log(cConfCountryNames)
 
-  cConfCountries = {}
+  var cConfCountries = {}
   for (let index in Object.keys(cConfSeries)){
     var countryName = `${cConfCountryNames[index]["id"]}`
     var countryData = cConfSeries[`${index}:0:0`]["observations"]
@@ -52,8 +52,86 @@ const process = function(data){
   }
   console.log(cConfCountries)
 
-  dataArray = []
+  var countryDict = {}
+  for (let country of Object.keys(cConfCountries)){
+    console.log(country)
+    var countryArray = []
+    for (let i = 0; i < 9; i++){
+        var year = i + 2007
+        var wisInYear = parseInt(wisCountries[country][i])
+        var cConfInYear = parseInt(cConfCountries[country][i])
+        countryArray.push([country, year, wisInYear, cConfInYear])
+    }
+    console.log(countryArray)
+    countryDict[country] = countryArray
+  }
+  console.log(countryDict)
+
+  var width = 3000
+  var height = 3000
+
+  pad = {
+    top: height * 0.05,
+    bottom: height * 0.1,
+    left: width* 0.1,
+    right: width * 0.01
+  };
+
+  var wChart = width - pad.left - pad.right;
+  var hChart = height - pad.bottom - pad.top;
+
+  selCountry = "FRA"
+  console.log(countryDict[`${selCountry}`])
+  var svg = d3.select("body")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height)
 
 
+  circles = svg.selectAll("circle")
+               .data(countryDict[`${selCountry}`])
+               .enter()
+               .append("circle")
+
+  // isolates the lowest data value from the data
+  var min = d3.min(ktoeList, function(d){
+                            return d[1];
+                          });
+  // isolates the highest data value from the data
+  var max = d3.max(ktoeList, function(d){
+                             return d[1];
+                           });
+  // isolates the starting year from the data
+  var minYear = d3.min(ktoeList, function(d){
+                             return d[0];
+                           });
+  // isolates the last year from the data
+  var maxYear = d3.max(ktoeList, function(d){
+                              return d[0];
+                            });
+
+  // rescales the x-values to the size of the graph
+  var xScale = d3.scaleLinear()
+             .domain([minYear, maxYear])
+             .range([pad.left, wChart - pad.right]);
+  // rescales the y-values to the size of the graph
+  var yScale = d3.scaleLinear()
+             .domain([0, max])
+             .range([hChart , pad.top]);
+
+
+  circles.attr("cx", function(d){
+                 return d[1];
+                 })
+         .attr("cy", function(d){
+                    return d[2];
+                 })
+         .attr("r", 5)
+         .attr("opacity", 1)
+         .attr("fill", function(d) {
+             // colScale works, but colour is only black or blue
+             // return "rgb(0,0," + (colScale(d)) + ")"
+                        return "black";
+                        })
 
 };

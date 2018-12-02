@@ -9,3 +9,9 @@
      color: navy;
      margin-left: 20px;
  }
+ .legend {                                                   /* NEW */
+         font-size: 12px;
+ }
+ rect {                                                      /* NEW */
+        stroke-width: 2;                                          /* NEW */
+ }    

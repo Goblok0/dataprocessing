@@ -67,8 +67,8 @@ const process = function(data){
   }
   console.log(countryDict)
 
-  var width = 3000
-  var height = 3000
+  var width = 500
+  var height = 500
 
   pad = {
     top: height * 0.05,
@@ -87,6 +87,12 @@ const process = function(data){
               .attr("width", width)
               .attr("height", height)
 
+  svg.append("rect")
+     .attr("width", "100%")
+     .attr("height", "100%")
+     .attr("fill", "grey")
+     .attr("opacity", 1);
+
 
   circles = svg.selectAll("circle")
                .data(countryDict[`${selCountry}`])
@@ -94,20 +100,20 @@ const process = function(data){
                .append("circle")
 
   // isolates the lowest data value from the data
-  var min = d3.min(ktoeList, function(d){
-                            return d[1];
+  var minWis = d3.min(countryDict[`${selCountry}`], function(d){
+                            return d[2];
                           });
   // isolates the highest data value from the data
-  var max = d3.max(ktoeList, function(d){
-                             return d[1];
+  var maxWis = d3.max(countryDict[`${selCountry}`], function(d){
+                             return d[2];
                            });
   // isolates the starting year from the data
-  var minYear = d3.min(ktoeList, function(d){
-                             return d[0];
+  var minYear = d3.min(countryDict[`${selCountry}`], function(d){
+                             return d[1];
                            });
   // isolates the last year from the data
-  var maxYear = d3.max(ktoeList, function(d){
-                              return d[0];
+  var maxYear = d3.max(countryDict[`${selCountry}`], function(d){
+                              return d[1];
                             });
 
   // rescales the x-values to the size of the graph
@@ -116,7 +122,7 @@ const process = function(data){
              .range([pad.left, wChart - pad.right]);
   // rescales the y-values to the size of the graph
   var yScale = d3.scaleLinear()
-             .domain([0, max])
+             .domain([0, maxWis])
              .range([hChart , pad.top]);
 
 

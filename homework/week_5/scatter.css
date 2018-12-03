@@ -9,9 +9,19 @@
      color: navy;
      margin-left: 20px;
  }
- .legend {                                                   /* NEW */
+
+ .legend {
          font-size: 12px;
  }
- rect {                                                      /* NEW */
-        stroke-width: 2;                                          /* NEW */
- }    
+
+ rect {
+        stroke-width: 2;
+ }
+
+.enter {
+  fill: green;
+}
+
+.update {
+  fill: #333;
+}

@@ -4,20 +4,20 @@
  */ -->
 
 <head>
-  <title>LOLWAT</title>
+  <title>LOLALT</title>
   <link rel="stylesheet" type="text/css" href="scatter.css">
+  <header name = "Access-Control-Allow-Origin" value = "*" />
 </head>
 <body>
   <script type="text/javascript" src="d3/d3.js"></script>
-
+  <script type ="text/javascript" src="scatter_alt.js"></script>
 
   <select id="selXVar">
-    <option value="1">Year</option>
     <option value="">Select Value for X</option>
-    <option value="0">Country</option>
-
-    <option value="2">Women in Science(%)</option>
-    <option value="3">Consumer Confidence</option>
+    <option value=0>Country</option>
+    <option value=1>Year</option>
+    <option value=2>Women in Science(%)</option>
+    <option value=3>Consumer Confidence</option>
   </select>
   <select id="selCountry">
     <option value="">Select Country for X</option>
@@ -30,22 +30,23 @@
     <option value="KOR">Korea</option>
   </select>
   <select id="selYVar">
-    <option value="2">Women in Science(%)</option>
     <option value="">Select Value for Y</option>
-    <option value="0">Country</option>
-    <option value="1">Year</option>
-
-    <option value="3">Consumer Confidence</option>
+    <option value=0>Country</option>
+    <option value=1>Year</option>
+    <option value=2>Women in Science(%)</option>
+    <option value=3>Consumer Confidence</option>
   </select>
   <select id="selColourVar">
-    <option value="0">Country</option>
     <option value="">Select Value for the Colour</option>
-
-    <option value="1">Year</option>
-    <option value="2">Women in Science(%)</option>
-    <option value="3">Consumer Confidence</option>
+    <option value=0>Country</option>
+    <option value=1>Year</option>
+    <option value=2>Women in Science(%)</option>
+    <option value=3>Consumer Confidence</option>
   </select>
-  <script type ="text/javascript" src="scatter.js"></script>
-  <button onclick="updateData()">Click me</button>
-
+  <div id="option">
+    <input name="updateButton"
+           type="button"
+           value="Update"
+           onclick="makeGraph()" />
+  </div>
 </body>

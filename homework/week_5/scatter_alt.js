@@ -5,7 +5,8 @@
  * - http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015
  * - http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015
  */
-var dataGlob = []
+
+
 window.onload = function() {
   var womenInScience = "http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015"
   var consConf = "http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015"
@@ -13,14 +14,13 @@ window.onload = function() {
   var requests = [d3.json(womenInScience), d3.json(consConf)];
 
   Promise.all(requests).then(function(response) {
-    dataGlob = preProcess(response);
-    makeGraph(dataGlob[0], dataGlob[1])
+    process(response);
   }).catch(function(e){
     throw(e);
   });
 };
 
-const preProcess = function(data){
+const process = function(data){
   // console.log(data)
   // per country[0-8: 2007-2015]
 
@@ -29,16 +29,45 @@ const preProcess = function(data){
   var wis = data[0]
   var wisSeries = wis["dataSets"]["0"]["series"]
   var wisCountryNames = wis["structure"]["dimensions"]["series"]["1"]["values"]
+  // console.log(wis)
+  // console.log(wisCountryNames)
   var wisCountries = extractWisData(wisSeries, wisCountryNames)
+
+
+  // console.log(wisCountries)
+
   // Consumer Confidence
   // countries FRA: France, NLD: Netherlands, PRT:Portugal, DEU: Germany, GBR: United Kingdom, KOR: Korea
   var cConf = data[1]
   var cConfSeries = cConf["dataSets"]["0"]["series"]
   var cConfCountryNames = cConf["structure"]["dimensions"]["series"]["0"]["values"]
+  // console.log(wisSeries)
+  // console.log(cConfCountryNames)
+
   var cConfCountries = extractCConfData(cConfSeries, cConfCountryNames)
 
-  countryDict = makeCountryDict(wisCountries, cConfCountries)
+  // console.log(cConfCountries)
 
+  var countryDict = {}
+  for (let country of Object.keys(cConfCountries)){
+    // console.log(country)
+    var countryArray = []
+    for (let i = 0; i < 9; i++){
+        var year = i + 2007
+        var wisInYear = parseInt(wisCountries[country][i])
+        var cConfInYear = parseInt(cConfCountries[country][i])
+        if (isNaN(wisInYear) || isNaN(cConfInYear)){
+            // console.log(wisInYear)
+            // console.log(cConfInYear)
+            continue
+        }
+
+        countryArray.push([country, year, wisInYear, cConfInYear])
+    }
+    // console.log(countryArray)
+    countryDict[country] = countryArray
+  }
+  // console.log(countryDict)
   // contains the data of all countries in one array
   countriesArray = []
   for (let country of Object.keys(countryDict)){
@@ -46,34 +75,16 @@ const preProcess = function(data){
           countriesArray.push(key)
       };
   };
-  return [countryDict, countriesArray]
-};
+  // console.log(countriesArray)
 
-const makeGraph = function(countryDict, countriesArray){
+
   var width = 500
   var height = 500
 
-  //corresponds to the variable in the array [country, year, wisInYear, cConfInyear]
-  var xVar = parseInt(document.getElementById('selXVar'))
-  var yVar = parseInt(document.getElementById("selYVar"))
-  var colourVar = parseInt(document.getElementById("selColourVar"))
-  console.log(xVar)
-  console.log(yVar)
-  console.log(colourVar)
-
-  if (isNaN(xVar)||isNaN(yVar)||isNaN(colourVar)){
-      alert("MEH")
-      var xVar = 1
-      var yVar = 2
-      var colourVar = 0
-  }
-  var selCountry = "FRA"
-  var selCountryData = countryDict[`${selCountry}`]
-  var selData = countriesArray
-
-  console.log(xVar)
-  console.log(yVar)
-  console.log(colourVar)
+  // corresponds to the variable in the array [country, year, wisInYear, cConfInyear]
+  var xVar = 1
+  var yVar = 2
+  var colourVar = 0
 
   pad = {
     top: height * 0.1,
@@ -82,11 +93,13 @@ const makeGraph = function(countryDict, countriesArray){
     right: width * 0.05
   };
 
-
+  console.log(width-(pad.right * 17))
   var wChart = width - pad.left - pad.right;
   var hChart = height - pad.bottom - pad.top;
 
-
+  var selCountry = "FRA"
+  var selCountryData = countryDict[`${selCountry}`]
+  var selData = countriesArray
   // var selData = selCountryData
   // console.log(selData)
 
@@ -107,18 +120,22 @@ const makeGraph = function(countryDict, countriesArray){
   var minY = d3.min(selData, function(d){
                             return d[yVar];
                           });
+  // console.log(minY)
   // isolates the highest data value from the data
   var maxY = d3.max(selData, function(d){
                              return d[yVar];
                            });
+  // console.log(maxY)
   // isolates the starting year from the data
   var minX = d3.min(selData, function(d){
                              return d[xVar];
                            });
+  // console.log(minX)
   // isolates the last year from the data
   var maxX = d3.max(selData, function(d){
                               return d[xVar];
                             });
+  // console.log(maxX)
 
   // rescales the x-values to the size of the graph
   var xScale = d3.scaleLinear()
@@ -168,7 +185,7 @@ const makeGraph = function(countryDict, countriesArray){
                                       + 0 + ")")
        .call(yAxis);
 
-
+    svg.append("g")
 
     var legData = new Set();
     for (let key of selData){
@@ -238,27 +255,8 @@ const makeGraph = function(countryDict, countriesArray){
            .style("text-anchor", "middle")
            .text(getAxisLabel(yVar));
 
-
 };
 // countries FRA: France, NLD: Netherlands, PRT:Portugal, DEU: Germany, GBR: United Kingdom, KOR: Korea
-const updateData = function(){
-  var countryDict = dataGlob[0]
-  var countriesArray = dataGlob[1]
-
-  var xVar = parseInt(document.getElementById("selXVar"))
-  var yVar = parseInt(document.getElementById("selYVar"))
-  var colourVar = parseInt(document.getElementById("selColourVar"))
-
-  console.log(xVar)
-  console.log(yVar)
-  console.log(colourVar)
-  var svg = d3.select("body")
-              .selectAll("svg")
-  var circles = svg.selectAll("circle")
-
-}
-
-
 
 const colourPicker = function(colourVar, d){
   var colourArray =  ['#a50026','#d73027','#f46d43','#fdae61','#fee090',
@@ -300,26 +298,6 @@ const extractCConfData = function(cConfSeries, cConfCountryNames){
   return cConfCountries;
 }
 
-const makeCountryDict = function(wisCountries, cConfCountries){
-  let countryDict = {}
-  for (let country of Object.keys(cConfCountries)){
-    // console.log(country)
-    var countryArray = []
-    for (let i = 0; i < 9; i++){
-        var year = i + 2007
-        var wisInYear = parseInt(wisCountries[country][i])
-        var cConfInYear = parseInt(cConfCountries[country][i])
-        if (isNaN(wisInYear) || isNaN(cConfInYear)){
-            continue
-        }
-
-        countryArray.push([country, year, wisInYear, cConfInYear])
-    }
-    // console.log(countryArray)
-    countryDict[country] = countryArray
-  }
-  return countryDict;
-}
 const getAxisLabel = function(xyVar){
   let labelArray = ["Countries", "Year",
                     "Percentage of women in Science(%)",

@@ -5,45 +5,47 @@
  */ -->
 
 <head>
-  <title>LOLWAT</title>
-  <link rel="stylesheet" type="text/css" href="scatter.css">
+    <title>Does MProg Dream of Electric Students</title>
+    <link rel="stylesheet" type="text/css" href="scatter.css">
 </head>
 <body>
-  <script type="text/javascript" src="d3/d3.js"></script>
-  <script type ="text/javascript" src="scatter.js"></script>
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <script type ="text/javascript" src="scatter.js"></script>
+    <h5>
+      <div> Made by: Julian Evalle, 11286369</div>
+      <div> This scatterplot can be used by selecting values from the drop-down
+            menu and clicking the "update chart" button
+      </div>
+    </h5>
+    <h2>
+      <select id="selYVar">
+          <option value="">Select Value for Y</option>
+          <option value="2">Women in Science(%)</option>
+          <option value="3">Consumer Confidence</option>
+      </select>
 
-  <h2>
-    <select id="selYVar">
-      <option value="">Select Value for Y</option>
-      <!-- <option value="0">Country</option> -->
-      <!-- <option value="1">Year</option> -->
-      <option value="2">Women in Science(%)</option>
-      <option value="3">Consumer Confidence</option>
-    </select>
+      <select id = "selXVar">
+          <option value="">Select Value for X</option>
+          <option value="1">Year</option>
+          <option value="2">Women in Science(%)</option>
+          <option value="3">Consumer Confidence</option>
+      </select>
 
-    <select id = "selXVar">
-      <option value="">Select Value for X</option>
-      <!-- <option value="0">Country</option> -->
-      <option value="1">Year</option>
-      <option value="2">Women in Science(%)</option>
-      <option value="3">Consumer Confidence</option>
-    </select>
-
-    <select id="selColourVar" class="fixed">
-      <optgroup label = "General Options">
-      <option value="0">All Countries</option>
-      <option value="1">Year</option>
-      </optgroup>
-      <optgroup label = "Specific Countries">
-        <option value="FRA">France</option>
-        <option value="NLD">Netherlands</option>
-        <option value="PRT">Portugal</option>
-        <option value="DEU">Germany</option>
-        <option value="GBR">Great Britain</option>
-        <option value="KOR">Korea</option>
-      </optgroup>
-    </select>
-    <button onclick="updateData()" class="fixed">Update Graph</button>
-  </h2>
+      <select id="selColourVar" class="fixed">
+          <optgroup label = "General Options">
+              <option value="0">All Countries</option>
+              <option value="1">Year</option>
+          </optgroup>
+          <optgroup label = "Specific Countries">
+              <option value="FRA">France</option>
+              <option value="NLD">Netherlands</option>
+              <option value="PRT">Portugal</option>
+              <option value="DEU">Germany</option>
+              <option value="GBR">Great Britain</option>
+              <option value="KOR">Korea</option>
+          </optgroup>
+      </select>
+      <button onclick="updateData()" class="fixed">Update Graph</button>
+    </h2>
 
 </body>

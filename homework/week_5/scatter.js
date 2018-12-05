@@ -1,11 +1,17 @@
 /* Made by: Julian Evalle
  * Opdr: D3 Scatter
  *
- *
- *
  * data obtained from:
  * - http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015
  * - http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015
+ *
+ * This programme creates a scatterplot from specifically structured datasets
+ * gained over API
+ *
+ * notitie naar nakijker: github geeft een foutmelding over externe bronnen als
+ * ik de HTML daar probeer te runnen
+ * Mixed Content: The page at 'https://goblok0.github.io/dataprocessing/homework/week_5/scatter.html' was loaded over HTTPS, but requested an insecure resource 'http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015'. This request has been blocked; the content must be served over HTTPS.d3.js:5908 Mixed Content: The page at 'https://goblok0.github.io/dataprocessing/homework/week_5/scatter.html' was loaded over HTTPS, but requested an * *
+ * insecure resource 'http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015'. This request has been blocked; the content must be served over HTTPS
  */
 
 
@@ -242,8 +248,6 @@ const makeGraph = function(countryDict, countriesArray){
            .attr("x", 0 - (height / 2))
            .style("text-anchor", "middle")
            .text(getAxisLabel(yVar));
-
-
 };
 // countries FRA: France, NLD: Netherlands, PRT:Portugal, DEU: Germany, GBR: United Kingdom, KOR: Korea
 const updateData = function(){

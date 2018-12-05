@@ -1,12 +1,17 @@
 /* Made by: Julian Evalle
  * Opdr: D3 Scatter
  *
+ *
+ *
  * data obtained from:
  * - http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015
  * - http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015
  */
+
+
 var dataGlob = []
 window.onload = function() {
+
   var womenInScience = "http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015"
   var consConf = "http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015"
 
@@ -14,6 +19,8 @@ window.onload = function() {
 
   Promise.all(requests).then(function(response) {
     dataGlob = preProcess(response);
+    console.log(dataGlob[0])
+    console.log(dataGlob[1])
     makeGraph(dataGlob[0], dataGlob[1])
   }).catch(function(e){
     throw(e);
@@ -49,27 +56,28 @@ const preProcess = function(data){
   return [countryDict, countriesArray]
 };
 
+//submit button
 const makeGraph = function(countryDict, countriesArray){
-  var width = 500
-  var height = 500
+  var width = 600
+  var height = 600
 
   //corresponds to the variable in the array [country, year, wisInYear, cConfInyear]
-  var xVar = parseInt(document.getElementById('selXVar'))
-  var yVar = parseInt(document.getElementById("selYVar"))
-  var colourVar = parseInt(document.getElementById("selColourVar"))
-  console.log(xVar)
-  console.log(yVar)
-  console.log(colourVar)
+  var xVar = document.getElementById("selXVar")
+  var xVar = parseInt(xVar.options[xVar.selectedIndex].value)
 
-  if (isNaN(xVar)||isNaN(yVar)||isNaN(colourVar)){
-      alert("MEH")
+  var yVar = document.getElementById("selYVar")
+  var yVar = parseInt(yVar.options[yVar.selectedIndex].value)
+
+  var colourVar = document.getElementById("selColourVar")
+  var colourVar = colourVar.options[colourVar.selectedIndex].value
+
+  if (isNaN(xVar)||isNaN(yVar)){
       var xVar = 1
       var yVar = 2
       var colourVar = 0
   }
-  var selCountry = "FRA"
-  var selCountryData = countryDict[`${selCountry}`]
-  var selData = countriesArray
+
+  var selData = (isNaN(parseInt(colourVar))) ? (countryDict[colourVar]):(countriesArray);
 
   console.log(xVar)
   console.log(yVar)
@@ -82,14 +90,8 @@ const makeGraph = function(countryDict, countriesArray){
     right: width * 0.05
   };
 
-
   var wChart = width - pad.left - pad.right;
   var hChart = height - pad.bottom - pad.top;
-
-
-  // var selData = selCountryData
-  // console.log(selData)
-
 
   var svg = d3.select("body")
               .append("svg")
@@ -144,7 +146,7 @@ const makeGraph = function(countryDict, countriesArray){
          .attr("r", 5)
          .attr("opacity", 1)
          .attr("fill", function(d) {
-                       var colour = colourPicker(colourVar, d[0])
+                       var colour = colourPicker(colourVar, d[colourVar])
                         return colour;
                         })
          .attr("data-legend",function(d) {
@@ -217,8 +219,11 @@ const makeGraph = function(countryDict, countriesArray){
                      var y = i * 15 + 3
                      return y
           })
-          .text(function(d) { return d;})
+          .text(function(d) {
+            var legText = (isNaN(parseInt(colourVar))) ? colourVar:d;
+            return legText;})
 
+        console.log(colourVar)
         svg.append("text")
            .attr("transform", "translate(" + (width * 0.5) + ","
                                            + (height * 0.05) + ")")
@@ -226,14 +231,14 @@ const makeGraph = function(countryDict, countriesArray){
            .text(getTitle(xVar, yVar, colourVar));
         // creates the X-axis label
         svg.append("text")
-           .attr("transform", "translate(" + width * 0.5 + ","
-                                           + (height * 0.99) + ")")
+           .attr("transform", "translate(" + width * 0.45 + ","
+                                           + (height * 0.89) + ")")
            .style("text-anchor", "middle")
            .text(getAxisLabel(xVar));
         // creates the Y-axis label
         svg.append("text")
            .attr("transform", "rotate(-90)")
-           .attr("y", width * 0.025)
+           .attr("y", width * 0.05)
            .attr("x", 0 - (height / 2))
            .style("text-anchor", "middle")
            .text(getAxisLabel(yVar));
@@ -242,44 +247,44 @@ const makeGraph = function(countryDict, countriesArray){
 };
 // countries FRA: France, NLD: Netherlands, PRT:Portugal, DEU: Germany, GBR: United Kingdom, KOR: Korea
 const updateData = function(){
-  var countryDict = dataGlob[0]
-  var countriesArray = dataGlob[1]
 
-  var xVar = parseInt(document.getElementById("selXVar"))
-  var yVar = parseInt(document.getElementById("selYVar"))
-  var colourVar = parseInt(document.getElementById("selColourVar"))
+  var xVar = document.getElementById("selXVar")
+  var xVar = parseInt(xVar.options[xVar.selectedIndex].value)
 
-  console.log(xVar)
-  console.log(yVar)
-  console.log(colourVar)
-  var svg = d3.select("body")
-              .selectAll("svg")
-  var circles = svg.selectAll("circle")
+  var yVar = document.getElementById("selYVar")
+  var yVar = parseInt(yVar.options[yVar.selectedIndex].value)
 
+  if (isNaN(xVar)||isNaN(yVar)){
+      return alert("One of the chosen variables is invalid")
+  }
+  d3.select("svg").remove();
+  makeGraph(dataGlob[0], dataGlob[1])
 }
 
-
-
 const colourPicker = function(colourVar, d){
+  // colourselection obtained from http://colorbrewer2.org
   var colourArray =  ['#a50026','#d73027','#f46d43','#fdae61','#fee090',
                       '#e0f3f8','#abd9e9','#74add1','#4575b4','#313695']
-
+  var countryColour = { "FRA": 0,
+                        "NLD": 1,
+                        "PRT": 2,
+                        "DEU": 3,
+                        "GBR": 4,
+                        "KOR": 5
+                      }
   if (colourVar == 0){
-      var countryColour = {
-        "FRA": 0,
-        "NLD": 1,
-        "PRT": 2,
-        "DEU": 3,
-        "GBR": 4,
-        "KOR": 5
-      }
+
       var colour = colourArray[countryColour[d]]
   }
-
+  else if (colourVar == 1) {
+      var colour = colourArray[d-2007]
+  }
+  else {
+      var colour = colourArray[countryColour[colourVar]]
+  }
   return colour
 }
 
-// [country, year, wisInYear, cConfInyear]
 const extractWisData = function(wisSeries, wisCountryNames){
   let wisCountries = {}
   for (let index in Object.keys(wisSeries)){
@@ -320,8 +325,9 @@ const makeCountryDict = function(wisCountries, cConfCountries){
   }
   return countryDict;
 }
+
 const getAxisLabel = function(xyVar){
-  let labelArray = ["Countries", "Year",
+  let labelArray = ["Country", "Year",
                     "Percentage of women in Science(%)",
                     "Consumer Confidence Index"]
   let label = labelArray[xyVar]
@@ -331,7 +337,12 @@ const getAxisLabel = function(xyVar){
 const getTitle = function(xVar, yVar, colourVar){
   let xLabel = getAxisLabel(xVar)
   let yLabel = getAxisLabel(yVar)
-  let cLabel = getAxisLabel(colourVar)
-
-  return `The ${yLabel} over ${xLabel} per ${cLabel}`
+  if (isNaN(parseInt(colourVar))) {
+    let cLabel = colourVar
+    return `The ${yLabel} over ${xLabel} in ${cLabel}`
+  }
+  else {
+    let cLabel = getAxisLabel(colourVar)
+    return `The ${yLabel} over ${xLabel} per ${cLabel}`
+  }
 }

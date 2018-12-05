@@ -13,15 +13,10 @@
  .legend {
          font-size: 12px;
  }
+ h2 {
+   position: absolute;
+   left: 100px;
+   top: 150px;
 
- rect {
-        stroke-width: 2;
+   background: #000
  }
-
-.enter {
-  fill: green;
-}
-
-.update {
-  fill: #333;
-}

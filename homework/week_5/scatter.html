@@ -1,6 +1,7 @@
 
 <!-- /* Made by: Julian Evalle
  * Opdr: D3 Scatter
+ * This HTML calls upon scatter.js
  */ -->
 
 <head>
@@ -9,43 +10,40 @@
 </head>
 <body>
   <script type="text/javascript" src="d3/d3.js"></script>
-
-
-  <select id="selXVar">
-    <option value="1">Year</option>
-    <option value="">Select Value for X</option>
-    <option value="0">Country</option>
-
-    <option value="2">Women in Science(%)</option>
-    <option value="3">Consumer Confidence</option>
-  </select>
-  <select id="selCountry">
-    <option value="">Select Country for X</option>
-    <option value="FRA">France</option>
-    <option value="FRA">France</option>
-    <option value="NLD">Netherlands</option>
-    <option value="PRT">Portugal</option>
-    <option value="DEU">Germany</option>
-    <option value="GBR">Great Britain</option>
-    <option value="KOR">Korea</option>
-  </select>
-  <select id="selYVar">
-    <option value="2">Women in Science(%)</option>
-    <option value="">Select Value for Y</option>
-    <option value="0">Country</option>
-    <option value="1">Year</option>
-
-    <option value="3">Consumer Confidence</option>
-  </select>
-  <select id="selColourVar">
-    <option value="0">Country</option>
-    <option value="">Select Value for the Colour</option>
-
-    <option value="1">Year</option>
-    <option value="2">Women in Science(%)</option>
-    <option value="3">Consumer Confidence</option>
-  </select>
   <script type ="text/javascript" src="scatter.js"></script>
-  <button onclick="updateData()">Click me</button>
+
+  <h2>
+    <select id="selYVar">
+      <option value="">Select Value for Y</option>
+      <!-- <option value="0">Country</option> -->
+      <!-- <option value="1">Year</option> -->
+      <option value="2">Women in Science(%)</option>
+      <option value="3">Consumer Confidence</option>
+    </select>
+
+    <select id = "selXVar">
+      <option value="">Select Value for X</option>
+      <!-- <option value="0">Country</option> -->
+      <option value="1">Year</option>
+      <option value="2">Women in Science(%)</option>
+      <option value="3">Consumer Confidence</option>
+    </select>
+
+    <select id="selColourVar" class="fixed">
+      <optgroup label = "General Options">
+      <option value="0">All Countries</option>
+      <option value="1">Year</option>
+      </optgroup>
+      <optgroup label = "Specific Countries">
+        <option value="FRA">France</option>
+        <option value="NLD">Netherlands</option>
+        <option value="PRT">Portugal</option>
+        <option value="DEU">Germany</option>
+        <option value="GBR">Great Britain</option>
+        <option value="KOR">Korea</option>
+      </optgroup>
+    </select>
+    <button onclick="updateData()" class="fixed">Update Graph</button>
+  </h2>
 
 </body>

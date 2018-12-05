@@ -13,8 +13,9 @@
  .legend {
          font-size: 12px;
  }
+ 
  h2 {
    position: absolute;
-   left: 100px;
-   top: 150px;
+   left: 10px;
+   top: 10px;
  }

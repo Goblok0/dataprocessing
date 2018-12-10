@@ -6,7 +6,7 @@
  * - http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015
  *
  * This programme creates a scatterplot from specifically structured datasets
- * gained over API and the input from the dropdown menu 
+ * gained over API and the input from the dropdown menu
  *
  * notitie naar nakijker: github geeft een foutmelding over externe bronnen als
  * ik de HTML daar probeer te runnen

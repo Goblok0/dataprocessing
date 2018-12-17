@@ -459,7 +459,7 @@ const makeValuesList = function(yDict) {
     return valuesList;
 };
 // returns a colour for the barchart
-const colourPicker = function(i {
+const colourPicker = function(i) {
   // colourselection obtained from http://colorbrewer2.org
   var index = i%5;
   var colourArray =  ['#a50026','#d73027','#f46d43','#fdae61','#fee090'];

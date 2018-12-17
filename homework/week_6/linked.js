@@ -1,5 +1,5 @@
 /* Made by: Julian Evalle
- * Opdr: D3 Scatter
+ * Opdr: Linked Views
  *
  * This programme creates a interactable chloropleth map and bar chart
  *
@@ -52,16 +52,19 @@ const chloroSetUp = function(data, worldmap) {
 
     d3.select("body")
       .append("p")
-      .text("Julian Evalle, 11286369, opdr Linked Views, Data obtained from: https://discovery.opendatasoft.com/explore/dataset/global-shark-attack-c/export/");
+      .text("Julian Evalle, 11286369, opdr Linked Views, Data obtained from:" +
+            "https://discovery.opendatasoft.com/explore/dataset/global-shark-attack-c/export/");
     d3.select("body")
       .append("p")
       .text("");
     d3.select("body")
       .append("p")
-      .text("Credit to: Alan Dunning, Tooltip: https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7");
+      .text("Credit to: Alan Dunning, Tooltip:" +
+            "https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7");
     d3.select("body")
       .append("p")
-      .text("Credit to: Micah Stubbs, Chlorograph v4 code: http://bl.ocks.org/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f ");
+      .text("Credit to: Micah Stubbs, Chlorograph v4 code:" +
+            "http://bl.ocks.org/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f ");
     d3.select("body")
       .append("p")
       .text("Prevalence of shark attacks in the world")
@@ -80,7 +83,7 @@ const chloroSetUp = function(data, worldmap) {
     // set scaler for alpha colour
     var colScale = d3.scaleLinear()
                      .domain([worldMin, 150])
-                     .range([0.3,1]);
+                     .range([0.3, 1]);
     // creates svg element for the chloropleth map
     var svg = d3.select("body")
                 .append("svg")
@@ -97,7 +100,7 @@ const chloroSetUp = function(data, worldmap) {
                     .data(legData)
                     .enter()
                     .append("g")
-                    .attr("class","legend")
+                    .attr("class", "legend")
                     .attr("transform", function(d,i) {
                                        var legX = 993
                                        var legY = 265
@@ -197,9 +200,9 @@ const chloroSetUp = function(data, worldmap) {
                                })
                .style('stroke', 'white')
                .style('stroke-width', 1.5)
-               .style("opacity",0.8)
+               .style("opacity", 0.8)
                // tooltips
-               .style("stroke","white")
+               .style("stroke", "white")
                .style('stroke-width', 0.3)
                .on('mouseover',function(d){
                               tooltip.style("left", d3.event.pageX - 50 + "px")
@@ -210,14 +213,14 @@ const chloroSetUp = function(data, worldmap) {
                               d3.select(this)
                                 .style("opacity", 1)
                                 .style("stroke","black")
-                                .style("stroke-width",1);
+                                .style("stroke-width", 1);
                               })
                .on('mouseout', function(d){
                                tooltip.style("display", "none");
                                d3.select(this)
                                  .style("opacity", 0.8)
-                                 .style("stroke","white")
-                                 .style("stroke-width",0.3);
+                                 .style("stroke", "white")
+                                 .style("stroke-width", 0.3);
                                })
                // updates barchart when country is clicked on
                .on("click", function(d){
@@ -316,15 +319,15 @@ const updateBars = function(data, svg, width, height) {
                                .html(`${d[0]} record(s)`);
                         d3.select(this)
                           .style("opacity", 1)
-                          .style("stroke","black")
-                          .style("stroke-width",1);
+                          .style("stroke", "black")
+                          .style("stroke-width", 1);
                         })
         .on('mouseout', function(d){
                         tooltip.style("display", "none");
                         d3.select(this)
                           .style("opacity", 0.8)
-                          .style("stroke","white")
-                          .style("stroke-width",0.3);
+                          .style("stroke", "white")
+                          .style("stroke-width", 0.3);
                         });
 
     // removes previously made axis
@@ -388,7 +391,7 @@ const updateBars = function(data, svg, width, height) {
    // places x-labels
    legend.append('text')
          .attr('x', function(d,i){
-                    var xCor =  i * barWidth + (barWidth/2);
+                    var xCor =  i * barWidth + (barWidth / 2);
                     return xCor;
                     })
          .attr('y', height * 0.25)

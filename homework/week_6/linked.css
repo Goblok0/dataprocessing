@@ -1,9 +1,12 @@
+/* Made by: Julian Evalle
+   Opdr: Linked Views */
 .names {
 fill: none;
 stroke: #fff;
 stroke-linejoin: round;
 }
 
+/* Alan Dunning, Tooltip: https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7" */
 .toolTip {
   position: absolute;
   display: none;
@@ -19,7 +22,7 @@ stroke-linejoin: round;
   color:white;
 }
 .legend {
-        font-size: 12px;
+  font-size: 12px;
 }
 h2 {
   position: absolute;
